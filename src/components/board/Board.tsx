@@ -8,11 +8,12 @@ import Square from "./Square";
 
 interface Props {
   board: BoardModel;
+  movePiece: (currentSquare: SquareModel, targetSquare: SquareModel) => void;
   playingAsWhite: boolean;
   playerTurn: PlayerColor;
 }
 
-function Board({ board, playingAsWhite, playerTurn }: Props) {
+function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
   const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(
     null,
   );
@@ -25,6 +26,20 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
     },
     [selectedSquare],
   );
+
+  const handleSelectSquare = (square: SquareModel) => {
+    if (!selectedSquare) return setSelectedSquare(square);
+
+    if (square.isNotEquals(selectedSquare)) {
+      movePiece(selectedSquare, square);
+
+      // Update player turn
+      // Check for checkmate
+      // Check for stalemate
+    }
+
+    setSelectedSquare(null);
+  };
 
   return (
     <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
@@ -45,10 +60,10 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
               square={square}
               showCoordinatesColumn={isFirstRow}
               showCoordinatesRow={isFirstColumn}
+              showAsValidMove={isValidMove(square)}
               isSelected={isSquareSelected}
               canSelect={canSelectSquare}
-              select={setSelectedSquare}
-              showAsValidMove={isValidMove(square)}
+              select={handleSelectSquare}
             />
           </div>
         );

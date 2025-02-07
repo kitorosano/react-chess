@@ -21,4 +21,9 @@ export default class BoardModel {
       }
     }
   }
+
+  updateSquarePiece(square: SquareModel, piece: PieceModel | null) {
+    const squareIndex = this.squares.findIndex((s) => s.isEquals(square));
+    this.squares[squareIndex].setPiece(piece);
+  }
 }

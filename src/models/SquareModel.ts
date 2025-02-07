@@ -29,7 +29,7 @@ export default class SquareModel {
     return this.coordinates.column;
   }
 
-  setPiece(piece: PieceModel): void {
+  setPiece(piece: PieceModel | null): void {
     this.piece = piece;
   }
 

@@ -8,7 +8,7 @@ interface Props {
   showCoordinatesRow?: boolean;
   isSelected?: boolean;
   canSelect?: boolean;
-  select: (square: SquareModel | null) => void;
+  select: (square: SquareModel) => void;
   showAsValidMove?: boolean;
 }
 
@@ -32,7 +32,7 @@ function Square({
   );
 
   const handleClick = () => {
-    if (canSelect) select(isSelected ? null : square);
+    if (canSelect) select(square);
   };
 
   return (

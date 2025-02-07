@@ -3,7 +3,7 @@ import PieceModel from "./PieceModel";
 export default class SquareModel {
   readonly row: number;
   readonly column: number;
-  piece: PieceModel;
+  piece: PieceModel | null = null;
 
   constructor(row: number, column: number) {
     this.row = row;

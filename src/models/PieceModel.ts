@@ -9,6 +9,20 @@ export enum PieceType {
   KING = "KING",
 }
 
+const pieceIcons: Record<string, string> = {
+  [PieceType.PAWN]: "fa-chess-pawn",
+  [PieceType.KNIGHT]: "fa-chess-knight",
+  [PieceType.BISHOP]: "fa-chess-bishop",
+  [PieceType.ROOK]: "fa-chess-rook",
+  [PieceType.QUEEN]: "fa-chess-queen",
+  [PieceType.KING]: "fa-chess-king",
+};
+
+const pieceColors: Record<string, string> = {
+  [PlayerColor.WHITE]: "text-white icon-shadow-white",
+  [PlayerColor.BLACK]: "text-black icon-shadow-black",
+};
+
 export default class PieceModel {
   readonly type: PieceType;
   readonly color: PlayerColor;
@@ -16,5 +30,9 @@ export default class PieceModel {
   constructor(type: PieceType, color: PlayerColor) {
     this.type = type;
     this.color = color;
+  }
+
+  getStyles(): string {
+    return `${pieceIcons[this.type]} ${pieceColors[this.color]}`;
   }
 }

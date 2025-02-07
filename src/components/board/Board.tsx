@@ -10,22 +10,19 @@ interface Props {
 
 function Board({ board, playingAsWhite }: Props) {
   return (
-    <>
-      <h2>Board</h2>
-      <section className="grid grid-rows-8 grid-cols-8 w-3/4 aspect-square m-auto my-4 border shadow">
-        {board.squares.map((square: SquareModel) => {
-          const squareStyles = getSquareStyles(square, playingAsWhite);
-          return (
-            <div
-              key={`square_${square.row}_${square.column}`}
-              className={`${squareStyles} h-full wf-full`}
-            >
-              <Square square={square} />
-            </div>
-          );
-        })}
-      </section>
-    </>
+    <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
+      {board.squares.map((square: SquareModel) => {
+        const squareStyles = getSquareStyles(square, playingAsWhite);
+        return (
+          <div
+            key={`square_${square.row}_${square.column}`}
+            className={`${squareStyles} h-full wf-full`}
+          >
+            <Square square={square} />
+          </div>
+        );
+      })}
+    </section>
   );
 }
 

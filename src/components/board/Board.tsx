@@ -20,6 +20,11 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
     <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
       {board.squares.map((square: SquareModel) => {
         const squareStyles = getSquareStyles(square, playingAsWhite);
+        const isFirstRow = square.row === 0;
+        const isFirstColumn = square.column === 0;
+        const isSquareSelected = selectedSquare?.isEquals(square);
+        const canSelectSquare = square?.piece?.color === playerTurn;
+
         return (
           <div
             key={`square_${square.row}_${square.column}`}
@@ -27,10 +32,10 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
           >
             <Square
               square={square}
-              showCoordinatesColumn={square.row === 0}
-              showCoordinatesRow={square.column === 0}
-              isSelected={selectedSquare?.isEquals(square)}
-              canSelect={square?.piece?.color === playerTurn}
+              showCoordinatesColumn={isFirstRow}
+              showCoordinatesRow={isFirstColumn}
+              isSelected={isSquareSelected}
+              canSelect={canSelectSquare}
               select={setSelectedSquare}
             />
           </div>

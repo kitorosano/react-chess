@@ -36,4 +36,8 @@ export default class SquareModel {
   isLightSquare(): boolean {
     return (this.row + this.column) % 2 !== 0;
   }
+
+  isEquals(square: SquareModel): boolean {
+    return this.row === square.row && this.column === square.column;
+  }
 }

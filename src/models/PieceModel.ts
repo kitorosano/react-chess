@@ -32,7 +32,11 @@ export default class PieceModel {
     this.color = color;
   }
 
-  getStyles(): string {
-    return `${pieceIcons[this.type]} ${pieceColors[this.color]}`;
+  getIcon(): string {
+    return pieceIcons[this.type];
+  }
+
+  getColor(): string {
+    return pieceColors[this.color];
   }
 }

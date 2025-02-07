@@ -14,3 +14,7 @@ const columnNotation: Record<number, string> = {
 export const getSquareCoordinates = (square: SquareModel): string => {
   return `${columnNotation[square.column]}${square.row + 1}`;
 };
+
+export const isLightSquare = (square: SquareModel): boolean => {
+  return (square.row + square.column) % 2 !== 0;
+};

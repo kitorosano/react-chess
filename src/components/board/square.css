@@ -1,0 +1,6 @@
+.icon-shadow-black {
+  filter: drop-shadow(0 0 1px white);
+}
+.icon-shadow-white {
+  filter: drop-shadow(0 0 1px black);
+}

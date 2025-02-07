@@ -10,8 +10,8 @@ export enum PieceType {
 }
 
 export default class PieceModel {
-  private readonly type: PieceType;
-  private readonly color: PlayerColor;
+  readonly type: PieceType;
+  readonly color: PlayerColor;
 
   constructor(type: PieceType, color: PlayerColor) {
     this.type = type;

@@ -39,4 +39,36 @@ export default class PieceModel {
   getColor(): string {
     return pieceColors[this.color];
   }
+
+  isWhite(): boolean {
+    return this.color === PlayerColor.WHITE;
+  }
+
+  isBlack(): boolean {
+    return this.color === PlayerColor.BLACK;
+  }
+
+  isPawn(): boolean {
+    return this.type === PieceType.PAWN;
+  }
+
+  isKnight(): boolean {
+    return this.type === PieceType.KNIGHT;
+  }
+
+  isBishop(): boolean {
+    return this.type === PieceType.BISHOP;
+  }
+
+  isRook(): boolean {
+    return this.type === PieceType.ROOK;
+  }
+
+  isQueen(): boolean {
+    return this.type === PieceType.QUEEN;
+  }
+
+  isKing(): boolean {
+    return this.type === PieceType.KING;
+  }
 }

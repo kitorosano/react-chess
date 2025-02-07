@@ -9,6 +9,7 @@ interface Props {
   isSelected?: boolean;
   canSelect?: boolean;
   select: (square: SquareModel | null) => void;
+  showAsValidMove?: boolean;
 }
 
 function Square({
@@ -18,6 +19,7 @@ function Square({
   isSelected,
   canSelect,
   select,
+  showAsValidMove,
 }: Props) {
   const backgroundColor = useMemo(
     () =>
@@ -51,9 +53,19 @@ function Square({
         </span>
       )}
 
+      {showAsValidMove && (
+        <span
+          className={`rounded-full ${
+            square.piece
+              ? "absolute w-12 h-12 border-2 border-gray-400"
+              : "bg-gray-400 w-4 h-4"
+          }`}
+        />
+      )}
+
       {square.piece && (
         <i
-          className={`fa-solid fa-2 xl ${square.piece.getIcon()} ${square.piece.getColor()}`}
+          className={`fa-solid fa-2xl ${square.piece.getIcon()} ${square.piece.getColor()}`}
         ></i>
       )}
     </div>

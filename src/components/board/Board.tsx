@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import BoardModel from "../../models/BoardModel";
 import { PlayerColor } from "../../models/PlayerModel";
 import SquareModel from "../../models/SquareModel";
 import { getSquareStyles } from "../../services/board-service";
+import { getValidMoves } from "../../services/move-service";
 import Square from "./Square";
 
 interface Props {
@@ -16,6 +17,15 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
     null,
   );
 
+  const isValidMove = useCallback(
+    (square: SquareModel) => {
+      return getValidMoves(selectedSquare).some((validMoveCoordinate) =>
+        validMoveCoordinate.isEquals(square.coordinates),
+      );
+    },
+    [selectedSquare],
+  );
+
   return (
     <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
       {board.squares.map((square: SquareModel) => {
@@ -23,7 +33,8 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
         const isFirstRow = square.row === 0;
         const isFirstColumn = square.column === 0;
         const isSquareSelected = selectedSquare?.isEquals(square);
-        const canSelectSquare = square?.piece?.color === playerTurn;
+        const canSelectSquare =
+          square?.piece?.color === playerTurn || isValidMove(square);
 
         return (
           <div
@@ -37,6 +48,7 @@ function Board({ board, playingAsWhite, playerTurn }: Props) {
               isSelected={isSquareSelected}
               canSelect={canSelectSquare}
               select={setSelectedSquare}
+              showAsValidMove={isValidMove(square)}
             />
           </div>
         );

@@ -1,3 +1,4 @@
+import { CoordinateModel } from "./CoordinateModel";
 import PieceModel from "./PieceModel";
 
 const columnNotation: Record<number, string> = {
@@ -12,13 +13,20 @@ const columnNotation: Record<number, string> = {
 };
 
 export default class SquareModel {
-  readonly row: number;
-  readonly column: number;
-  piece: PieceModel | null = null;
+  coordinates: CoordinateModel;
+  piece: PieceModel | null;
 
   constructor(row: number, column: number) {
-    this.row = row;
-    this.column = column;
+    this.coordinates = new CoordinateModel(row, column);
+    this.piece = null;
+  }
+
+  get row(): number {
+    return this.coordinates.row;
+  }
+
+  get column(): number {
+    return this.coordinates.column;
   }
 
   setPiece(piece: PieceModel): void {
@@ -26,18 +34,25 @@ export default class SquareModel {
   }
 
   getColumnCoordinates(): string {
-    return columnNotation[this.column];
+    return columnNotation[this.coordinates.column];
   }
 
   getRowCoordinates(): string {
-    return `${this.row + 1}`;
+    return `${this.coordinates.row + 1}`;
   }
 
   isLightSquare(): boolean {
-    return (this.row + this.column) % 2 !== 0;
+    return (this.coordinates.row + this.coordinates.column) % 2 !== 0;
   }
 
   isEquals(square: SquareModel): boolean {
-    return this.row === square.row && this.column === square.column;
+    return (
+      this.coordinates.row === square.coordinates.row &&
+      this.coordinates.column === square.coordinates.column
+    );
+  }
+
+  isNotEquals(square: SquareModel): boolean {
+    return !this.isEquals(square);
   }
 }

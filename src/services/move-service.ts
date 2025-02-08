@@ -3,16 +3,23 @@ import { CoordinateModel } from "../models/CoordinateModel";
 import { PieceType } from "../models/PieceModel";
 import SquareModel from "../models/SquareModel";
 
+interface CheckValidMove {
+  board: BoardModel;
+  square: SquareModel;
+  targetCoordinate: CoordinateModel;
+  blockIfOppositeColor?: boolean;
+}
 interface MoveCheck {
   move: CoordinateModel | null;
   shouldBreak: boolean;
 }
 
-const checkValidMove = (
-  board: BoardModel,
-  square: SquareModel,
-  targetCoordinate: CoordinateModel,
-): MoveCheck => {
+const checkValidMove = ({
+  board,
+  square,
+  targetCoordinate,
+  blockIfOppositeColor = false,
+}: CheckValidMove): MoveCheck => {
   const moveCheck: MoveCheck = {
     move: null,
     shouldBreak: false,
@@ -20,8 +27,8 @@ const checkValidMove = (
 
   const targetSquare = board.getSquareOnCoordinate(targetCoordinate);
 
-  if (targetSquare.piece) {
-    if (!targetSquare.isPieceSameColor(square))
+  if (targetSquare?.piece) {
+    if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor)
       moveCheck.move = targetCoordinate;
     moveCheck.shouldBreak = true;
   } else {
@@ -37,8 +44,8 @@ interface GetRowColumnValidMovesProps {
   startPos: number;
   endPos: number;
   increment: number;
-  updateRow?: boolean;
-  updateColumn?: boolean;
+  rowIncrement: number;
+  columnIncrement: number;
 }
 
 const getRowAndColumnValidMoves = ({
@@ -47,8 +54,8 @@ const getRowAndColumnValidMoves = ({
   startPos,
   endPos,
   increment,
-  updateRow,
-  updateColumn,
+  rowIncrement,
+  columnIncrement,
 }: GetRowColumnValidMovesProps): Array<CoordinateModel> => {
   const validMoves: Array<CoordinateModel> = [];
 
@@ -57,11 +64,12 @@ const getRowAndColumnValidMoves = ({
     increment > 0 ? i <= endPos : i >= endPos;
     i += increment
   ) {
-    const targetRow = updateRow ? i : square.row;
-    const targetColumn = updateColumn ? i : square.column;
+    const count = Math.abs(i - startPos) + 1;
+    const targetRow = square.row + count * rowIncrement;
+    const targetColumn = square.column + count * columnIncrement;
     const targetCoordinate = new CoordinateModel(targetRow, targetColumn);
 
-    const possibleMove = checkValidMove(board, square, targetCoordinate);
+    const possibleMove = checkValidMove({ board, square, targetCoordinate });
     if (possibleMove.move) validMoves.push(possibleMove.move);
     if (possibleMove.shouldBreak) break;
   }
@@ -75,7 +83,7 @@ export const getValidMoves = (
 ): Array<CoordinateModel> => {
   if (!square || !square.piece) return [];
 
-  const validMoves: Array<CoordinateModel> = [];
+  const validMoves: Array<CoordinateModel | null> = [];
 
   switch (square.piece.type) {
     case PieceType.PAWN: {
@@ -112,27 +120,65 @@ export const getValidMoves = (
       break;
   }
 
-  return validMoves.filter(isMoveOutOfBounds).filter((move) => {
-    return !isMoveSameSquare(move, square);
-  });
+  return validMoves.filter((move) => !!move).filter(isMoveOutOfBounds);
 };
 
 const getValidPawnMoves = (board: BoardModel, square: SquareModel) => {
-  const validMoves: Array<CoordinateModel> = [];
-  const row = square.row;
-  const column = square.column;
+  const validMoves: Array<CoordinateModel | null> = [];
   const isWhite = square.piece!.isWhite();
 
   if (isWhite) {
-    validMoves.push(new CoordinateModel(row + 1, column));
-    const isFirstMove = row === 1;
+    const targetCoordinate = new CoordinateModel(square.row + 1, square.column);
+    validMoves.push(
+      checkValidMove({
+        board,
+        square,
+        targetCoordinate,
+        blockIfOppositeColor: true,
+      }).move,
+    );
 
-    if (isFirstMove) validMoves.push(new CoordinateModel(row + 2, column));
+    const isFirstMove = square.row === 1;
+    if (isFirstMove) {
+      const targetCoordinate = new CoordinateModel(
+        square.row + 2,
+        square.column,
+      );
+      validMoves.push(
+        checkValidMove({
+          board,
+          square,
+          targetCoordinate,
+          blockIfOppositeColor: true,
+        }).move,
+      );
+    }
   } else {
-    validMoves.push(new CoordinateModel(row - 1, column));
+    const targetCoordinate = new CoordinateModel(square.row - 1, square.column);
+    validMoves.push(
+      checkValidMove({
+        board,
+        square,
+        targetCoordinate,
+        blockIfOppositeColor: true,
+      }).move,
+    );
 
-    const isFirstMove = row === 6;
-    if (isFirstMove) validMoves.push(new CoordinateModel(row - 2, column));
+    const isFirstMove = square.row === 6;
+    if (isFirstMove) {
+      const targetCoordinate = new CoordinateModel(
+        square.row - 2,
+        square.column,
+      );
+      validMoves.push(
+        checkValidMove({
+          board,
+          square,
+          targetCoordinate,
+          blockIfOppositeColor: true,
+        }).move,
+      );
+    }
   }
 
   return validMoves;
@@ -146,7 +192,8 @@ const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
       startPos: square.column + 1,
       endPos: 7,
       increment: 1,
-      updateColumn: true,
+      rowIncrement: 0,
+      columnIncrement: 1,
     }),
     ...getRowAndColumnValidMoves({
       board,
@@ -154,7 +201,8 @@ const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
       startPos: square.column - 1,
       endPos: 0,
       increment: -1,
-      updateColumn: true,
+      rowIncrement: 0,
+      columnIncrement: -1,
     }),
     ...getRowAndColumnValidMoves({
       board,
@@ -162,7 +210,8 @@ const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
       startPos: square.row + 1,
       endPos: 7,
       increment: 1,
-      updateRow: true,
+      rowIncrement: 1,
+      columnIncrement: 0,
     }),
     ...getRowAndColumnValidMoves({
       board,
@@ -170,7 +219,8 @@ const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
       startPos: square.row - 1,
       endPos: 0,
       increment: -1,
-      updateRow: true,
+      rowIncrement: -1,
+      columnIncrement: 0,
     }),
   ];
 
@@ -178,14 +228,17 @@ const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
 };
 
 const getValidKnightMoves = (board: BoardModel, square: SquareModel) => {
-  const validMoves: Array<CoordinateModel> = [];
+  const validMoves: Array<CoordinateModel | null> = [];
   const row = square.row;
   const column = square.column;
 
   for (let i = -2; i < 3; i++) {
     for (let j = -2; j < 3; j++) {
       if (Math.abs(i) + Math.abs(j) === 3) {
-        validMoves.push(new CoordinateModel(row + i, column + j));
+        const targetCoordinate = new CoordinateModel(row + i, column + j);
+        validMoves.push(
+          checkValidMove({ board, square, targetCoordinate }).move,
+        );
       }
     }
   }
@@ -194,16 +247,44 @@ const getValidKnightMoves = (board: BoardModel, square: SquareModel) => {
 };
 
 const getValidBishopMoves = (board: BoardModel, square: SquareModel) => {
-  const validMoves: Array<CoordinateModel> = [];
-  const row = square.row;
-  const column = square.column;
-
-  for (let i = 0; i <= 8; i++) {
-    validMoves.push(new CoordinateModel(row + i, column + i));
-    validMoves.push(new CoordinateModel(row - i, column - i));
-    validMoves.push(new CoordinateModel(row + i, column - i));
-    validMoves.push(new CoordinateModel(row - i, column + i));
-  }
+  const validMoves: Array<CoordinateModel> = [
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row + 1,
+      endPos: 7,
+      increment: 1,
+      rowIncrement: 1,
+      columnIncrement: 1,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row + 1,
+      endPos: 7,
+      increment: 1,
+      rowIncrement: 1,
+      columnIncrement: -1,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row - 1,
+      endPos: 0,
+      increment: -1,
+      rowIncrement: -1,
+      columnIncrement: 1,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row - 1,
+      endPos: 0,
+      increment: -1,
+      rowIncrement: -1,
+      columnIncrement: -1,
+    }),
+  ];
 
   return validMoves;
 };
@@ -218,13 +299,15 @@ const getValidQueenMoves = (board: BoardModel, square: SquareModel) => {
 };
 
 const getValidKingMoves = (board: BoardModel, square: SquareModel) => {
-  const validMoves: Array<CoordinateModel> = [];
-  const row = square.row;
-  const column = square.column;
+  const validMoves: Array<CoordinateModel | null> = [];
 
   for (let i = -1; i < 2; i++) {
     for (let j = -1; j < 2; j++) {
-      validMoves.push(new CoordinateModel(row + i, column + j));
+      const targetCoordinate = new CoordinateModel(
+        square.row + i,
+        square.column + j,
+      );
+      validMoves.push(checkValidMove({ board, square, targetCoordinate }).move);
     }
   }
 
@@ -233,11 +316,4 @@ const getValidKingMoves = (board: BoardModel, square: SquareModel) => {
 
 const isMoveOutOfBounds = (move: CoordinateModel): boolean => {
   return move.row >= 0 && move.row < 8 && move.column >= 0 && move.column < 8;
-};
-
-const isMoveSameSquare = (
-  move: CoordinateModel,
-  square: SquareModel,
-): boolean => {
-  return move.row === square.row && move.column === square.column;
 };

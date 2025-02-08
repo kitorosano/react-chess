@@ -1,44 +1,110 @@
+import BoardModel from "../models/BoardModel";
 import { CoordinateModel } from "../models/CoordinateModel";
 import { PieceType } from "../models/PieceModel";
 import SquareModel from "../models/SquareModel";
 
+interface MoveCheck {
+  move: CoordinateModel | null;
+  shouldBreak: boolean;
+}
+
+const checkValidMove = (
+  board: BoardModel,
+  square: SquareModel,
+  targetCoordinate: CoordinateModel,
+): MoveCheck => {
+  const moveCheck: MoveCheck = {
+    move: null,
+    shouldBreak: false,
+  };
+
+  const targetSquare = board.getSquareOnCoordinate(targetCoordinate);
+
+  if (targetSquare.piece) {
+    if (!targetSquare.isPieceSameColor(square))
+      moveCheck.move = targetCoordinate;
+    moveCheck.shouldBreak = true;
+  } else {
+    moveCheck.move = targetCoordinate;
+  }
+
+  return moveCheck;
+};
+
+interface GetRowColumnValidMovesProps {
+  board: BoardModel;
+  square: SquareModel;
+  startPos: number;
+  endPos: number;
+  increment: number;
+  updateRow?: boolean;
+  updateColumn?: boolean;
+}
+
+const getRowAndColumnValidMoves = ({
+  board,
+  square,
+  startPos,
+  endPos,
+  increment,
+  updateRow,
+  updateColumn,
+}: GetRowColumnValidMovesProps): Array<CoordinateModel> => {
+  const validMoves: Array<CoordinateModel> = [];
+
+  for (
+    let i = startPos;
+    increment > 0 ? i <= endPos : i >= endPos;
+    i += increment
+  ) {
+    const targetRow = updateRow ? i : square.row;
+    const targetColumn = updateColumn ? i : square.column;
+    const targetCoordinate = new CoordinateModel(targetRow, targetColumn);
+
+    const possibleMove = checkValidMove(board, square, targetCoordinate);
+    if (possibleMove.move) validMoves.push(possibleMove.move);
+    if (possibleMove.shouldBreak) break;
+  }
+
+  return validMoves;
+};
+
 export const getValidMoves = (
+  board: BoardModel,
   square: SquareModel | null,
 ): Array<CoordinateModel> => {
   if (!square || !square.piece) return [];
 
   const validMoves: Array<CoordinateModel> = [];
-  const { row, column } = square.coordinates;
 
   switch (square.piece.type) {
     case PieceType.PAWN: {
-      const isWhite = square.piece.isWhite();
-      const validPawnMoves = getValidPawnMoves(row, column, isWhite);
+      const validPawnMoves = getValidPawnMoves(board, square);
       validMoves.push(...validPawnMoves);
       break;
     }
     case PieceType.ROOK: {
-      const validRookMoves = getValidRookMoves(row, column);
+      const validRookMoves = getValidRookMoves(board, square);
       validMoves.push(...validRookMoves);
       break;
     }
     case PieceType.KNIGHT: {
-      const validKnightMoves = getValidKnightMoves(row, column);
+      const validKnightMoves = getValidKnightMoves(board, square);
       validMoves.push(...validKnightMoves);
       break;
     }
     case PieceType.BISHOP: {
-      const validBishopMoves = getValidBishopMoves(row, column);
+      const validBishopMoves = getValidBishopMoves(board, square);
       validMoves.push(...validBishopMoves);
       break;
     }
     case PieceType.QUEEN: {
-      const validQueenMoves = getValidQueenMoves(row, column);
+      const validQueenMoves = getValidQueenMoves(board, square);
       validMoves.push(...validQueenMoves);
       break;
     }
     case PieceType.KING: {
-      const validKingMoves = getValidKingMoves(row, column);
+      const validKingMoves = getValidKingMoves(board, square);
       validMoves.push(...validKingMoves);
       break;
     }
@@ -51,8 +117,11 @@ export const getValidMoves = (
   });
 };
 
-const getValidPawnMoves = (row: number, column: number, isWhite: boolean) => {
+const getValidPawnMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel> = [];
+  const row = square.row;
+  const column = square.column;
+  const isWhite = square.piece!.isWhite();
 
   if (isWhite) {
     validMoves.push(new CoordinateModel(row + 1, column));
@@ -69,19 +138,49 @@ const getValidPawnMoves = (row: number, column: number, isWhite: boolean) => {
   return validMoves;
 };
 
-const getValidRookMoves = (row: number, column: number) => {
-  const validMoves: Array<CoordinateModel> = [];
-
-  for (let i = 0; i < 8; i++) {
-    validMoves.push(new CoordinateModel(row, i));
-    validMoves.push(new CoordinateModel(i, column));
-  }
+const getValidRookMoves = (board: BoardModel, square: SquareModel) => {
+  const validMoves: Array<CoordinateModel> = [
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.column + 1,
+      endPos: 7,
+      increment: 1,
+      updateColumn: true,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.column - 1,
+      endPos: 0,
+      increment: -1,
+      updateColumn: true,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row + 1,
+      endPos: 7,
+      increment: 1,
+      updateRow: true,
+    }),
+    ...getRowAndColumnValidMoves({
+      board,
+      square,
+      startPos: square.row - 1,
+      endPos: 0,
+      increment: -1,
+      updateRow: true,
+    }),
+  ];
 
   return validMoves;
 };
 
-const getValidKnightMoves = (row: number, column: number) => {
+const getValidKnightMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel> = [];
+  const row = square.row;
+  const column = square.column;
 
   for (let i = -2; i < 3; i++) {
     for (let j = -2; j < 3; j++) {
@@ -94,10 +193,12 @@ const getValidKnightMoves = (row: number, column: number) => {
   return validMoves;
 };
 
-const getValidBishopMoves = (row: number, column: number) => {
+const getValidBishopMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel> = [];
+  const row = square.row;
+  const column = square.column;
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i <= 8; i++) {
     validMoves.push(new CoordinateModel(row + i, column + i));
     validMoves.push(new CoordinateModel(row - i, column - i));
     validMoves.push(new CoordinateModel(row + i, column - i));
@@ -107,17 +208,19 @@ const getValidBishopMoves = (row: number, column: number) => {
   return validMoves;
 };
 
-const getValidQueenMoves = (row: number, column: number) => {
+const getValidQueenMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel> = [];
 
-  validMoves.push(...getValidRookMoves(row, column));
-  validMoves.push(...getValidBishopMoves(row, column));
+  validMoves.push(...getValidRookMoves(board, square));
+  validMoves.push(...getValidBishopMoves(board, square));
 
   return validMoves;
 };
 
-const getValidKingMoves = (row: number, column: number) => {
+const getValidKingMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel> = [];
+  const row = square.row;
+  const column = square.column;
 
   for (let i = -1; i < 2; i++) {
     for (let j = -1; j < 2; j++) {

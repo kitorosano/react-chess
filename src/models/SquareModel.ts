@@ -1,6 +1,28 @@
 import { CoordinateModel } from "./CoordinateModel";
 import PieceModel from "./PieceModel";
 
+const rowStartClasses: Record<number, string> = {
+  1: "row-start-1",
+  2: "row-start-2",
+  3: "row-start-3",
+  4: "row-start-4",
+  5: "row-start-5",
+  6: "row-start-6",
+  7: "row-start-7",
+  8: "row-start-8",
+};
+
+const colStartClasses: Record<number, string> = {
+  1: "col-start-1",
+  2: "col-start-2",
+  3: "col-start-3",
+  4: "col-start-4",
+  5: "col-start-5",
+  6: "col-start-6",
+  7: "col-start-7",
+  8: "col-start-8",
+};
+
 const columnNotation: Record<number, string> = {
   0: "a",
   1: "b",
@@ -29,6 +51,15 @@ export default class SquareModel {
     return this.coordinates.column;
   }
 
+  getStyles(playingAsWhite: boolean): string {
+    const rowIndex = playingAsWhite ? 8 - this.row : this.row + 1;
+    const colIndex = playingAsWhite ? this.column + 1 : 8 - this.column;
+    const rowStartStyle = rowStartClasses[rowIndex];
+    const colStartStyle = colStartClasses[colIndex];
+
+    return `${rowStartStyle} ${colStartStyle}`;
+  }
+
   setPiece(piece: PieceModel | null): void {
     this.piece = piece;
   }
@@ -54,5 +85,9 @@ export default class SquareModel {
 
   isNotEquals(square: SquareModel): boolean {
     return !this.isEquals(square);
+  }
+
+  isPieceSameColor(square: SquareModel): boolean {
+    return this.piece?.color === square.piece?.color;
   }
 }

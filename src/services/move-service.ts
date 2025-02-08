@@ -8,6 +8,7 @@ interface CheckValidMove {
   square: SquareModel;
   targetCoordinate: CoordinateModel;
   blockIfOppositeColor?: boolean;
+  blockIfEmpty?: boolean;
 }
 interface MoveCheck {
   move: CoordinateModel | null;
@@ -19,6 +20,7 @@ const checkValidMove = ({
   square,
   targetCoordinate,
   blockIfOppositeColor = false,
+  blockIfEmpty = false,
 }: CheckValidMove): MoveCheck => {
   const moveCheck: MoveCheck = {
     move: null,
@@ -31,7 +33,7 @@ const checkValidMove = ({
     if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor)
       moveCheck.move = targetCoordinate;
     moveCheck.shouldBreak = true;
-  } else {
+  } else if (!blockIfEmpty) {
     moveCheck.move = targetCoordinate;
   }
 
@@ -125,25 +127,27 @@ export const getValidMoves = (
 
 const getValidPawnMoves = (board: BoardModel, square: SquareModel) => {
   const validMoves: Array<CoordinateModel | null> = [];
+  const { row, column } = square;
   const isWhite = square.piece!.isWhite();
 
   if (isWhite) {
-    const targetCoordinate = new CoordinateModel(square.row + 1, square.column);
-    validMoves.push(
-      checkValidMove({
-        board,
-        square,
-        targetCoordinate,
-        blockIfOppositeColor: true,
-      }).move,
-    );
-
-    const isFirstMove = square.row === 1;
-    if (isFirstMove) {
-      const targetCoordinate = new CoordinateModel(
-        square.row + 2,
-        square.column,
+    for (let i = -1; i <= 2; i++) {
+      const isDiagonal = i !== 0;
+      const targetCoordinate = new CoordinateModel(row + 1, column + i);
+      validMoves.push(
+        checkValidMove({
+          board,
+          square,
+          targetCoordinate,
+          blockIfOppositeColor: !isDiagonal,
+          blockIfEmpty: isDiagonal,
+        }).move,
       );
+    }
+
+    const isFirstMove = row === 1;
+    if (isFirstMove) {
+      const targetCoordinate = new CoordinateModel(row + 2, column);
       validMoves.push(
         checkValidMove({
           board,
@@ -154,22 +158,23 @@ const getValidPawnMoves = (board: BoardModel, square: SquareModel) => {
       );
     }
   } else {
-    const targetCoordinate = new CoordinateModel(square.row - 1, square.column);
-    validMoves.push(
-      checkValidMove({
-        board,
-        square,
-        targetCoordinate,
-        blockIfOppositeColor: true,
-      }).move,
-    );
-
-    const isFirstMove = square.row === 6;
-    if (isFirstMove) {
-      const targetCoordinate = new CoordinateModel(
-        square.row - 2,
-        square.column,
+    for (let i = -1; i <= 2; i++) {
+      const isDiagonal = i !== 0;
+      const targetCoordinate = new CoordinateModel(row - 1, column + i);
+      validMoves.push(
+        checkValidMove({
+          board,
+          square,
+          targetCoordinate,
+          blockIfOppositeColor: !isDiagonal,
+          blockIfEmpty: isDiagonal,
+        }).move,
       );
+    }
+
+    const isFirstMove = row === 6;
+    if (isFirstMove) {
+      const targetCoordinate = new CoordinateModel(row - 2, column);
       validMoves.push(
         checkValidMove({
           board,

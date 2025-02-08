@@ -1,4 +1,5 @@
 import { initialPiecePositions } from "../constants/initial-piece-positions";
+import { CoordinateModel } from "./CoordinateModel";
 import PieceModel from "./PieceModel";
 import SquareModel from "./SquareModel";
 
@@ -20,6 +21,10 @@ export default class BoardModel {
         this.squares.push(square);
       }
     }
+  }
+
+  getSquareOnCoordinate(coordinate: CoordinateModel): SquareModel {
+    return this.squares.find((s) => s.coordinates.isEquals(coordinate))!;
   }
 
   updateSquarePiece(square: SquareModel, piece: PieceModel | null) {

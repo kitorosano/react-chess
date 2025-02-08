@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import BoardModel from "../../models/BoardModel";
 import { PlayerColor } from "../../models/PlayerModel";
 import SquareModel from "../../models/SquareModel";
-import { getSquareStyles } from "../../services/board-service";
 import { getValidMoves } from "../../services/move-service";
 import Square from "./Square";
 
@@ -20,15 +19,16 @@ function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
 
   const isValidMove = useCallback(
     (square: SquareModel) => {
-      return getValidMoves(selectedSquare).some((validMoveCoordinate) =>
+      return getValidMoves(board, selectedSquare).some((validMoveCoordinate) =>
         validMoveCoordinate.isEquals(square.coordinates),
       );
     },
-    [selectedSquare],
+    [board, selectedSquare],
   );
 
   const handleSelectSquare = (square: SquareModel) => {
-    if (!selectedSquare) return setSelectedSquare(square);
+    if (!selectedSquare || !isValidMove(square))
+      return setSelectedSquare(square);
 
     if (square.isNotEquals(selectedSquare)) {
       movePiece(selectedSquare, square);
@@ -44,7 +44,7 @@ function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
   return (
     <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
       {board.squares.map((square: SquareModel) => {
-        const squareStyles = getSquareStyles(square, playingAsWhite);
+        const squareStyles = square.getStyles(playingAsWhite);
         const isFirstRow = square.row === 0;
         const isFirstColumn = square.column === 0;
         const isSquareSelected = selectedSquare?.isEquals(square);

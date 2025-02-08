@@ -71,4 +71,8 @@ export default class PieceModel {
   isKing(): boolean {
     return this.type === PieceType.KING;
   }
+
+  isSameColor(piece: PieceModel): boolean {
+    return this.color === piece.color;
+  }
 }

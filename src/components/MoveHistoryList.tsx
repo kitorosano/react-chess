@@ -14,7 +14,7 @@ function MoveHistoryList({ moveHistory }: Props) {
             {isWhiteMove && (
               <span className="mr-1 ml-2 text-gray-400">{index / 2 + 1}.</span>
             )}
-            {move.toNotation}
+            {move.notation}
           </span>
         );
       })}

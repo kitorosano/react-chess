@@ -1,4 +1,5 @@
 import { pieceNotation, PieceType } from "../constants/piece-info";
+import { columnNotation } from "../constants/square-info";
 import { CoordinateModel } from "./CoordinateModel";
 import { PlayerColor } from "./PlayerModel";
 
@@ -32,10 +33,13 @@ export default class MoveHistoryModel {
     this.hasCaptured = hasCaptured;
   }
 
-  get toNotation(): string {
+  get notation(): string {
+    const { column, row } = this.to;
     if (this.hasCaptured) {
-      return pieceNotation[this.piece] + "x" + this.to.getNotation();
+      return (
+        pieceNotation[this.piece] + "x" + columnNotation[column] + (row + 1)
+      );
     }
-    return pieceNotation[this.piece] + this.to.getNotation();
+    return pieceNotation[this.piece] + columnNotation[column] + (row + 1);
   }
 }

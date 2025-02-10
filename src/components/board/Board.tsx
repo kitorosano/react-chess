@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import BoardModel from "../../models/BoardModel";
+import MoveModel from "../../models/MoveModel";
 import { PlayerColor } from "../../models/PlayerModel";
 import SquareModel from "../../models/SquareModel";
 import { getValidMoves } from "../../services/move-service";
@@ -7,7 +8,11 @@ import Square from "./Square";
 
 interface Props {
   board: BoardModel;
-  movePiece: (currentSquare: SquareModel, targetSquare: SquareModel) => void;
+  movePiece: (
+    currentSquare: SquareModel,
+    targetSquare: SquareModel,
+    move: MoveModel,
+  ) => void;
   playingAsWhite: boolean;
   playerTurn: PlayerColor;
 }
@@ -17,13 +22,27 @@ function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
     null,
   );
 
+  const validMoves: Array<MoveModel> = useMemo(
+    () => getValidMoves(board, selectedSquare),
+    [board, selectedSquare],
+  );
+
   const isValidMove = useCallback(
-    (square: SquareModel) => {
-      return getValidMoves(board, selectedSquare).some((validMoveCoordinate) =>
-        validMoveCoordinate.isEquals(square.coordinates),
+    (square: SquareModel): boolean => {
+      return validMoves.some((validMoveCoordinates) =>
+        validMoveCoordinates.isEquals(square.coordinates),
       );
     },
-    [board, selectedSquare],
+    [validMoves],
+  );
+
+  const getMove = useCallback(
+    (square: SquareModel): MoveModel => {
+      return validMoves.find((validMoveCoordinates) =>
+        validMoveCoordinates.isEquals(square.coordinates),
+      )!;
+    },
+    [validMoves],
   );
 
   const handleSelectSquare = (square: SquareModel) => {
@@ -31,11 +50,7 @@ function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
       return setSelectedSquare(square);
 
     if (square.isNotEquals(selectedSquare)) {
-      movePiece(selectedSquare, square);
-
-      // Update player turn
-      // Check for checkmate
-      // Check for stalemate
+      movePiece(selectedSquare, square, getMove(square));
     }
 
     setSelectedSquare(null);

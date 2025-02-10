@@ -15,4 +15,24 @@ export default class MoveModel extends CoordinateModel {
     super(row, column);
     this.type = type;
   }
+
+  isNormal(): boolean {
+    return this.type === MoveType.NORMAL;
+  }
+
+  isCastleKingSide(): boolean {
+    return this.type === MoveType.CASTLE_KING_SIDE;
+  }
+
+  isCastleQueenSide(): boolean {
+    return this.type === MoveType.CASTLE_QUEEN_SIDE;
+  }
+
+  isEnPassant(): boolean {
+    return this.type === MoveType.EN_PASSANT;
+  }
+
+  isPromotion(): boolean {
+    return this.type === MoveType.PROMOTION;
+  }
 }

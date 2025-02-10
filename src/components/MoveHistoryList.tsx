@@ -6,14 +6,19 @@ interface Props {
 
 function MoveHistoryList({ moveHistory }: Props) {
   return (
-    <ol>
+    <section className="w-full flex flex-wrap">
       {moveHistory.map((move, index) => {
-        const text = `${
-          move.piece
-        }: ${move.from.getCoordinates()} --> ${move.to.getCoordinates()}`;
-        return <li key={index}>{text}</li>;
+        const isWhiteMove = index % 2 === 0;
+        return (
+          <span key={index} className="text-xs mx-0.5">
+            {isWhiteMove && (
+              <span className="mr-1 ml-2 text-gray-400">{index / 2 + 1}.</span>
+            )}
+            {move.toNotation}
+          </span>
+        );
       })}
-    </ol>
+    </section>
   );
 }
 

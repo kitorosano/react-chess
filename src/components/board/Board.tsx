@@ -42,7 +42,7 @@ function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
   };
 
   return (
-    <section className="grid grid-rows-8 grid-cols-8 max-w-xl aspect-square m-auto my-4 border shadow">
+    <section className="grid grid-rows-8 grid-cols-8 w-full mx-auto aspect-square my-2 border shadow">
       {board.squares.map((square: SquareModel) => {
         const squareStyles = square.getStyles(playingAsWhite);
         const isFirstRow = square.row === 0;

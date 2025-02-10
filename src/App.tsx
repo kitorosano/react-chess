@@ -25,10 +25,11 @@ function App() {
     const from = currentSquare.coordinates,
       to = targetSquare.coordinates,
       piece = currentPiece.type,
-      color = currentPiece.color;
+      color = currentPiece.color,
+      hasCaptured = !!targetSquare.piece?.type;
     setMoveHistory((currentHistory) => [
       ...currentHistory,
-      new MoveModel(from, to, piece, color),
+      new MoveModel(from, to, piece, color, hasCaptured),
     ]);
     setPlayerTurn((currentTurn) =>
       currentTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
@@ -36,8 +37,7 @@ function App() {
   };
 
   return (
-    <>
-      <h1>React Chess</h1>
+    <main className="max-w-xl w-3/4 mx-auto my-4">
       <Board
         board={board}
         playingAsWhite={true}
@@ -45,7 +45,7 @@ function App() {
         movePiece={handleMovePiece}
       />
       <MoveHistoryList moveHistory={moveHistory} />
-    </>
+    </main>
   );
 }
 

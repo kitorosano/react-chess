@@ -15,6 +15,15 @@ export enum PieceType {
   KING = "KING",
 }
 
+export const pieceNotation = {
+  [PieceType.PAWN]: "", 
+  [PieceType.KNIGHT]: "N",
+  [PieceType.BISHOP]: "B",
+  [PieceType.ROOK]: "R",
+  [PieceType.QUEEN]: "Q",
+  [PieceType.KING]: "K",
+};
+
 export const pieceIcons: Record<string, string> = {
   [PieceType.PAWN]: "fa-chess-pawn",
   [PieceType.KNIGHT]: "fa-chess-knight",

@@ -1,3 +1,5 @@
+import { columnNotation } from "../constants/square-info";
+
 export class CoordinateModel {
   row: number;
   column: number;
@@ -5,6 +7,10 @@ export class CoordinateModel {
   constructor(row: number, column: number) {
     this.row = row;
     this.column = column;
+  }
+
+  getNotation(): string {
+    return columnNotation[this.column] + (this.row + 1);
   }
 
   getCoordinates(): string {

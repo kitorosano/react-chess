@@ -28,6 +28,48 @@ export default class KingPieceModel extends PieceModel {
       }
     }
 
+    // Check for castling
+    if (this.hasMoved) return validMoves;
+
+    const kingRow = this.isWhite() ? 0 : 7;
+    if (this.canKingSideCastle(board, kingRow)) {
+      validMoves.push(new CoordinateModel(kingRow, 6));
+    }
+    if (this.canQueenSideCastle(board, kingRow)) {
+      validMoves.push(new CoordinateModel(kingRow, 2));
+    }
+
     return validMoves;
+  };
+
+  canKingSideCastle = (board: BoardModel, kingRow: number): boolean => {
+    const { piece: kingSideRook } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 7),
+    );
+    const { piece: kingSideKnight } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 6),
+    );
+    const { piece: kingSideBishop } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 5),
+    );
+    return !kingSideRook?.hasMoved && !kingSideKnight && !kingSideBishop;
+  };
+
+  canQueenSideCastle = (board: BoardModel, kingRow: number): boolean => {
+    const { piece: queenSideRook } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 0),
+    );
+    const { piece: queenSideKnight } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 1),
+    );
+    const { piece: queenSideBishop } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 2),
+    );
+    const { piece: queen } = board.getSquareOnCoordinate(
+      new CoordinateModel(kingRow, 3),
+    );
+    return (
+      !queenSideRook?.hasMoved && !queenSideKnight && !queenSideBishop && !queen
+    );
   };
 }

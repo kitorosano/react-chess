@@ -18,7 +18,7 @@ function App() {
   ) => {
     const { piece: currentPiece } = currentSquare;
     if (!currentPiece) return;
-
+    currentPiece.setHasMoved();
     board.updateSquarePiece(targetSquare, currentPiece);
     board.updateSquarePiece(currentSquare, null);
 

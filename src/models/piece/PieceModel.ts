@@ -12,6 +12,7 @@ import SquareModel from "../SquareModel";
 export default abstract class PieceModel {
   readonly type: PieceType;
   readonly color: PlayerColor;
+  hasMoved: boolean = false;
 
   constructor(type: PieceType, color: PlayerColor) {
     this.type = type;
@@ -69,5 +70,9 @@ export default abstract class PieceModel {
 
   isSameColor(piece: PieceModel): boolean {
     return this.color === piece.color;
+  }
+
+  setHasMoved(): void {
+    this.hasMoved = true;
   }
 }

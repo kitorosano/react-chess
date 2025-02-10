@@ -1,3 +1,4 @@
+import { BOARD_COLUMNS, BOARD_ROWS } from "../../constants/board-info";
 import { PieceType } from "../../constants/piece-info";
 import { getRowAndColumnValidMoves } from "../../services/move-service";
 import BoardModel from "../BoardModel";
@@ -19,7 +20,7 @@ export default class RookPieceModel extends PieceModel {
         board,
         square,
         startPos: square.column + 1,
-        endPos: 7,
+        endPos: BOARD_COLUMNS - 1,
         increment: 1,
         rowIncrement: 0,
         columnIncrement: 1,
@@ -37,7 +38,7 @@ export default class RookPieceModel extends PieceModel {
         board,
         square,
         startPos: square.row + 1,
-        endPos: 7,
+        endPos: BOARD_ROWS - 1,
         increment: 1,
         rowIncrement: 1,
         columnIncrement: 0,

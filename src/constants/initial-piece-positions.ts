@@ -85,3 +85,14 @@ export const initialPiecePositions: Array<PiecePosition> = [
     playerColor: PlayerColor.BLACK,
   },
 ];
+
+// initial rook coordinates
+export const KING_SIDE_ROOK_COLUMN = 7;
+export const QUEEN_SIDE_ROOK_COLUMN = 0;
+export const KING_SIDE_CASTLED_ROOK_COLUMN = 5;
+export const QUEEN_SIDE_CASTLED_ROOK_COLUMN = 3;
+
+// king coordinates
+export const KING_START_COLUMN = 4;
+export const KING_SIDE_CASTLED_KING_COLUMN = 6;
+export const QUEEN_SIDE_CASTLED_KING_COLUMN = 2;

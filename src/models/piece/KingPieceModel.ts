@@ -1,3 +1,7 @@
+import {
+  KING_SIDE_CASTLED_KING_COLUMN,
+  QUEEN_SIDE_CASTLED_KING_COLUMN,
+} from "../../constants/initial-piece-positions";
 import { PieceType } from "../../constants/piece-info";
 import { checkValidMove } from "../../services/move-service";
 import BoardModel from "../BoardModel";
@@ -28,11 +32,19 @@ export default class KingPieceModel extends PieceModel {
 
     const kingRow = this.isWhite() ? 0 : 7;
     if (this.canKingSideCastle(board, kingRow)) {
-      const targetMove = new MoveModel(kingRow, 6, MoveType.CASTLE_KING_SIDE);
+      const targetMove = new MoveModel(
+        kingRow,
+        KING_SIDE_CASTLED_KING_COLUMN,
+        MoveType.CASTLE_KING_SIDE,
+      );
       validMoves.push(targetMove);
     }
     if (this.canQueenSideCastle(board, kingRow)) {
-      const targetMove = new MoveModel(kingRow, 2, MoveType.CASTLE_QUEEN_SIDE);
+      const targetMove = new MoveModel(
+        kingRow,
+        QUEEN_SIDE_CASTLED_KING_COLUMN,
+        MoveType.CASTLE_QUEEN_SIDE,
+      );
       validMoves.push(targetMove);
     }
 

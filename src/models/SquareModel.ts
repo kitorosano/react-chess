@@ -1,5 +1,5 @@
 import { CoordinateModel } from "./CoordinateModel";
-import PieceModel from "./PieceModel";
+import PieceModel from "./piece/PieceModel";
 
 const rowStartClasses: Record<number, string> = {
   1: "row-start-1",

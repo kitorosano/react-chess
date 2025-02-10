@@ -65,7 +65,7 @@ function Square({
 
       {square.piece && (
         <i
-          className={`fa-solid fa-2xl ${square.piece.getIcon()} ${square.piece.getColor()}`}
+          className={`fa-solid fa-2xl ${square.piece.getStylesIcon()} ${square.piece.getStylesColor()}`}
         ></i>
       )}
     </div>

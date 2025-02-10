@@ -96,3 +96,9 @@ export const QUEEN_SIDE_CASTLED_ROOK_COLUMN = 3;
 export const KING_START_COLUMN = 4;
 export const KING_SIDE_CASTLED_KING_COLUMN = 6;
 export const QUEEN_SIDE_CASTLED_KING_COLUMN = 2;
+
+// initial pawn coordinates
+export const WHITE_PAWN_ROW = 1;
+export const BLACK_PAWN_ROW = 6;
+export const WHITE_ROW_FOR_EN_PASSANT = 4;
+export const BLACK_ROW_FOR_EN_PASSANT = 3;

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import BoardModel from "../../models/BoardModel";
+import MoveHistoryModel from "../../models/MoveHistoryModel";
 import MoveModel from "../../models/MoveModel";
 import { PlayerColor } from "../../models/PlayerModel";
 import SquareModel from "../../models/SquareModel";
@@ -8,24 +9,31 @@ import Square from "./Square";
 
 interface Props {
   board: BoardModel;
+  playingAsWhite: boolean;
+  playerTurn: PlayerColor;
+  moveHistory: Array<MoveHistoryModel>;
   movePiece: (
     currentSquare: SquareModel,
     targetSquare: SquareModel,
     move: MoveModel,
   ) => void;
-  playingAsWhite: boolean;
-  playerTurn: PlayerColor;
 }
 
-function Board({ board, movePiece, playingAsWhite, playerTurn }: Props) {
+function Board({
+  board,
+  movePiece,
+  playingAsWhite,
+  playerTurn,
+  moveHistory,
+}: Props) {
   const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(
     null,
   );
 
-  const validMoves: Array<MoveModel> = useMemo(
-    () => getValidMoves(board, selectedSquare),
-    [board, selectedSquare],
-  );
+  const validMoves: Array<MoveModel> = useMemo(() => {
+    const lastMove = moveHistory[moveHistory.length - 1] ?? null;
+    return getValidMoves(board, selectedSquare, lastMove);
+  }, [board, selectedSquare, moveHistory]);
 
   const isValidMove = useCallback(
     (square: SquareModel): boolean => {

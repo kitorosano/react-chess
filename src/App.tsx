@@ -12,6 +12,7 @@ import BoardModel from "./models/BoardModel";
 import { CoordinateModel } from "./models/CoordinateModel";
 import MoveHistoryModel from "./models/MoveHistoryModel";
 import MoveModel from "./models/MoveModel";
+import PieceModel from "./models/piece/PieceModel";
 import { PlayerColor } from "./models/PlayerModel";
 import SquareModel from "./models/SquareModel";
 
@@ -35,12 +36,25 @@ function App() {
     board.updateSquarePiece(currentRookSquare, null);
   };
 
+  const handleEnPassant = (
+    currentPiece: PieceModel,
+    targetSquare: SquareModel,
+  ) => {
+    const { row, column } = targetSquare;
+    const targetRow = currentPiece.isWhite() ? row - 1 : row + 1;
+    const pawnToRemoveSquare = board.getSquareOnCoordinate(
+      new CoordinateModel(targetRow, column),
+    );
+    board.updateSquarePiece(pawnToRemoveSquare, null);
+  };
+
   const handleMovePiece = (
     currentSquare: SquareModel,
     targetSquare: SquareModel,
     move: MoveModel,
   ) => {
     const { piece: currentPiece } = currentSquare;
+    const { piece: targetPiece } = targetSquare;
     if (!currentPiece) return;
 
     currentPiece.setHasMoved();
@@ -61,15 +75,19 @@ function App() {
         QUEEN_SIDE_CASTLED_ROOK_COLUMN,
       );
     }
+    if (move.isEnPassant()) {
+      handleEnPassant(currentPiece, targetSquare);
+    }
 
     const from = currentSquare.coordinates,
       to = targetSquare.coordinates,
       piece = currentPiece.type,
       color = currentPiece.color,
-      hasCaptured = !!targetSquare.piece?.type;
+      hasCaptured = !!targetPiece?.type,
+      moveType = move.type;
     setMoveHistory((currentHistory) => [
       ...currentHistory,
-      new MoveHistoryModel(from, to, piece, color, hasCaptured),
+      new MoveHistoryModel(from, to, piece, color, hasCaptured, moveType),
     ]);
     setPlayerTurn((currentTurn) =>
       currentTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
@@ -82,6 +100,7 @@ function App() {
         board={board}
         playingAsWhite={true}
         playerTurn={playerTurn}
+        moveHistory={moveHistory}
         movePiece={handleMovePiece}
       />
       <MoveHistoryList moveHistory={moveHistory} />

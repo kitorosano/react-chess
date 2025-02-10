@@ -1,5 +1,6 @@
 import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import BoardModel from "../models/BoardModel";
+import MoveHistoryModel from "../models/MoveHistoryModel";
 import MoveModel from "../models/MoveModel";
 import SquareModel from "../models/SquareModel";
 
@@ -86,10 +87,11 @@ export const getRowAndColumnValidMoves = ({
 export const getValidMoves = (
   board: BoardModel,
   square: SquareModel | null,
+  lastMove: MoveHistoryModel | null,
 ): Array<MoveModel> => {
   if (!square || !square.piece) return [];
 
-  const validMoves = square.piece.getValidMoves(board, square);
+  const validMoves = square.piece.getValidMoves(board, square, lastMove);
 
   return validMoves.filter(doesMoveExists).filter(isMoveOutOfBounds);
 };

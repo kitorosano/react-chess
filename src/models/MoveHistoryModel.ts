@@ -1,15 +1,8 @@
 import { pieceNotation, PieceType } from "../constants/piece-info";
 import { columnNotation } from "../constants/square-info";
 import { CoordinateModel } from "./CoordinateModel";
+import { MoveType } from "./MoveModel";
 import { PlayerColor } from "./PlayerModel";
-
-export enum MoveType {
-  NORMAL = "NORMAL",
-  CASTLE_KING_SIDE = "CASTLE_KING_SIDE",
-  CASTLE_QUEEN_SIDE = "CASTLE_QUEEN_SIDE ",
-  EN_PASSANT = "EN_PASSANT",
-  PROMOTION = "PROMOTION",
-}
 
 export default class MoveHistoryModel {
   from: CoordinateModel;
@@ -17,7 +10,7 @@ export default class MoveHistoryModel {
   piece: PieceType;
   color: PlayerColor;
   hasCaptured: boolean;
-  type: MoveType = MoveType.NORMAL;
+  type: MoveType;
 
   constructor(
     from: CoordinateModel,
@@ -25,15 +18,24 @@ export default class MoveHistoryModel {
     piece: PieceType,
     color: PlayerColor,
     hasCaptured: boolean = false,
+    type: MoveType,
   ) {
     this.from = from;
     this.to = to;
     this.piece = piece;
     this.color = color;
     this.hasCaptured = hasCaptured;
+    this.type = type;
   }
 
   get notation(): string {
+    if (this.type === MoveType.CASTLE_KING_SIDE) {
+      return "O-O";
+    }
+    if (this.type === MoveType.CASTLE_QUEEN_SIDE) {
+      return "O-O-O";
+    }
+
     const { column, row } = this.to;
     if (this.hasCaptured) {
       return (

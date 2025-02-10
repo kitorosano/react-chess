@@ -7,6 +7,10 @@ export class CoordinateModel {
     this.column = column;
   }
 
+  getCoordinates(): string {
+    return `${this.row}${this.column}`;
+  }
+
   setRow(row: number) {
     this.row = row;
   }

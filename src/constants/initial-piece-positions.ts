@@ -1,5 +1,5 @@
-import { PieceType } from "../models/piece/PieceModel";
 import { PlayerColor } from "../models/PlayerModel";
+import { PieceType } from "./piece-info";
 
 interface PiecePosition {
   rows: Array<number>;

@@ -1,3 +1,4 @@
+import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import {
   colStartClasses,
   columnNotation,
@@ -24,8 +25,10 @@ export default class SquareModel {
   }
 
   getStyles(playingAsWhite: boolean): string {
-    const rowIndex = playingAsWhite ? 8 - this.row : this.row + 1;
-    const colIndex = playingAsWhite ? this.column + 1 : 8 - this.column;
+    const rowIndex = playingAsWhite ? BOARD_ROWS - this.row : this.row + 1;
+    const colIndex = playingAsWhite
+      ? this.column + 1
+      : BOARD_COLUMNS - this.column;
     const rowStartStyle = rowStartClasses[rowIndex];
     const colStartStyle = colStartClasses[colIndex];
 

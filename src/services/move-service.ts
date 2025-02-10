@@ -1,3 +1,4 @@
+import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import BoardModel from "../models/BoardModel";
 import MoveModel from "../models/MoveModel";
 import SquareModel from "../models/SquareModel";
@@ -95,5 +96,10 @@ export const getValidMoves = (
 
 const doesMoveExists = (move: MoveModel | null) => !!move;
 const isMoveOutOfBounds = (move: MoveModel): boolean => {
-  return move.row >= 0 && move.row < 8 && move.column >= 0 && move.column < 8;
+  return (
+    move.row >= 0 &&
+    move.row < BOARD_ROWS &&
+    move.column >= 0 &&
+    move.column < BOARD_COLUMNS
+  );
 };

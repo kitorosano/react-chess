@@ -1,3 +1,4 @@
+import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import { initialPiecePositions } from "../constants/initial-piece-positions";
 import { CoordinateModel } from "./CoordinateModel";
 import PieceModel from "./piece/PieceModel";
@@ -7,8 +8,8 @@ export default class BoardModel {
   squares: Array<SquareModel> = [];
 
   constructor() {
-    for (let row = 0; row < 8; row++) {
-      for (let column = 0; column < 8; column++) {
+    for (let row = 0; row < BOARD_ROWS; row++) {
+      for (let column = 0; column < BOARD_COLUMNS; column++) {
         const square = new SquareModel(row, column);
 
         initialPiecePositions.forEach((piecePosition) => {

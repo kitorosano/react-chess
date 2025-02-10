@@ -43,30 +43,41 @@ export default class KingPieceModel extends PieceModel {
     const { piece: kingSideRook } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 7),
     );
-    const { piece: kingSideKnight } = board.getSquareOnCoordinate(
+    const { piece: PieceOnColumnG } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 6),
     );
-    const { piece: kingSideBishop } = board.getSquareOnCoordinate(
+    const { piece: pieceOnColumnF } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 5),
     );
-    return !kingSideRook?.hasMoved && !kingSideKnight && !kingSideBishop;
+    return (
+      !!kingSideRook &&
+      kingSideRook.isRook() &&
+      !kingSideRook?.hasMoved &&
+      !PieceOnColumnG &&
+      !pieceOnColumnF
+    );
   };
 
   canQueenSideCastle = (board: BoardModel, kingRow: number): boolean => {
     const { piece: queenSideRook } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 0),
     );
-    const { piece: queenSideKnight } = board.getSquareOnCoordinate(
+    const { piece: pieceOnColumnB } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 1),
     );
-    const { piece: queenSideBishop } = board.getSquareOnCoordinate(
+    const { piece: pieceOnColumnC } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 2),
     );
-    const { piece: queen } = board.getSquareOnCoordinate(
+    const { piece: pieceOnColumnD } = board.getSquareOnCoordinate(
       new MoveModel(kingRow, 3),
     );
     return (
-      !queenSideRook?.hasMoved && !queenSideKnight && !queenSideBishop && !queen
+      !!queenSideRook &&
+      queenSideRook.isRook() &&
+      !queenSideRook?.hasMoved &&
+      !pieceOnColumnB &&
+      !pieceOnColumnC &&
+      !pieceOnColumnD
     );
   };
 }

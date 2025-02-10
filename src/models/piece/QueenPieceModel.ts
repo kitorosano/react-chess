@@ -1,10 +1,15 @@
+import { PieceType } from "../../constants/piece-info";
 import { getRowAndColumnValidMoves } from "../../services/move-service";
 import BoardModel from "../BoardModel";
 import { CoordinateModel } from "../CoordinateModel";
+import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
 import PieceModel from "./PieceModel";
 
 export default class QueenPieceModel extends PieceModel {
+  constructor(color: PlayerColor) {
+    super(PieceType.QUEEN, color);
+  }
   getValidMoves = (
     board: BoardModel,
     square: SquareModel,

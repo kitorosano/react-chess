@@ -14,7 +14,7 @@ export default class BoardModel {
         initialPiecePositions.forEach((piecePosition) => {
           const { rows, columns, pieceType, playerColor } = piecePosition;
           if (rows.includes(row) && columns.includes(column)) {
-            square.setPiece(new PieceModel(pieceType, playerColor));
+            square.setPiece(PieceModel.create(pieceType, playerColor));
           }
         });
 

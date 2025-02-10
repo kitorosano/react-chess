@@ -1,30 +1,13 @@
+import {
+  pieceClasses,
+  pieceColors,
+  pieceIcons,
+  PieceType,
+} from "../../constants/piece-info";
 import BoardModel from "../BoardModel";
 import { CoordinateModel } from "../CoordinateModel";
 import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
-
-export enum PieceType {
-  PAWN = "PAWN",
-  KNIGHT = "KNIGHT",
-  BISHOP = "BISHOP",
-  ROOK = "ROOK",
-  QUEEN = "QUEEN",
-  KING = "KING",
-}
-
-const pieceIcons: Record<string, string> = {
-  [PieceType.PAWN]: "fa-chess-pawn",
-  [PieceType.KNIGHT]: "fa-chess-knight",
-  [PieceType.BISHOP]: "fa-chess-bishop",
-  [PieceType.ROOK]: "fa-chess-rook",
-  [PieceType.QUEEN]: "fa-chess-queen",
-  [PieceType.KING]: "fa-chess-king",
-};
-
-const pieceColors: Record<string, string> = {
-  [PlayerColor.WHITE]: "text-white icon-shadow-white",
-  [PlayerColor.BLACK]: "text-black icon-shadow-black",
-};
 
 export default abstract class PieceModel {
   readonly type: PieceType;
@@ -34,6 +17,15 @@ export default abstract class PieceModel {
     this.type = type;
     this.color = color;
   }
+
+  static create(type: PieceType, color: PlayerColor): PieceModel {
+    return new pieceClasses[type](color);
+  }
+
+  abstract getValidMoves(
+    board: BoardModel,
+    square: SquareModel,
+  ): Array<CoordinateModel | null>;
 
   getIcon(): string {
     return pieceIcons[this.type];
@@ -50,11 +42,6 @@ export default abstract class PieceModel {
   isBlack(): boolean {
     return this.color === PlayerColor.BLACK;
   }
-
-  abstract getValidMoves(
-    board: BoardModel,
-    square: SquareModel,
-  ): Array<CoordinateModel | null>;
 
   isPawn(): boolean {
     return this.type === PieceType.PAWN;

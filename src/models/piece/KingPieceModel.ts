@@ -1,7 +1,7 @@
 import { PieceType } from "../../constants/piece-info";
 import { checkValidMove } from "../../services/move-service";
 import BoardModel from "../BoardModel";
-import { CoordinateModel } from "../CoordinateModel";
+import MoveModel, { MoveType } from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
 import PieceModel from "./PieceModel";
@@ -13,18 +13,13 @@ export default class KingPieceModel extends PieceModel {
   getValidMoves = (
     board: BoardModel,
     square: SquareModel,
-  ): Array<CoordinateModel | null> => {
-    const validMoves: Array<CoordinateModel | null> = [];
+  ): Array<MoveModel | null> => {
+    const validMoves: Array<MoveModel | null> = [];
 
     for (let i = -1; i < 2; i++) {
       for (let j = -1; j < 2; j++) {
-        const targetCoordinate = new CoordinateModel(
-          square.row + i,
-          square.column + j,
-        );
-        validMoves.push(
-          checkValidMove({ board, square, targetCoordinate }).move,
-        );
+        const targetMove = new MoveModel(square.row + i, square.column + j);
+        validMoves.push(checkValidMove({ board, square, targetMove }).move);
       }
     }
 
@@ -33,10 +28,12 @@ export default class KingPieceModel extends PieceModel {
 
     const kingRow = this.isWhite() ? 0 : 7;
     if (this.canKingSideCastle(board, kingRow)) {
-      validMoves.push(new CoordinateModel(kingRow, 6));
+      const targetMove = new MoveModel(kingRow, 6, MoveType.CASTLE_KING_SIDE);
+      validMoves.push(targetMove);
     }
     if (this.canQueenSideCastle(board, kingRow)) {
-      validMoves.push(new CoordinateModel(kingRow, 2));
+      const targetMove = new MoveModel(kingRow, 2, MoveType.CASTLE_QUEEN_SIDE);
+      validMoves.push(targetMove);
     }
 
     return validMoves;
@@ -44,29 +41,29 @@ export default class KingPieceModel extends PieceModel {
 
   canKingSideCastle = (board: BoardModel, kingRow: number): boolean => {
     const { piece: kingSideRook } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 7),
+      new MoveModel(kingRow, 7),
     );
     const { piece: kingSideKnight } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 6),
+      new MoveModel(kingRow, 6),
     );
     const { piece: kingSideBishop } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 5),
+      new MoveModel(kingRow, 5),
     );
     return !kingSideRook?.hasMoved && !kingSideKnight && !kingSideBishop;
   };
 
   canQueenSideCastle = (board: BoardModel, kingRow: number): boolean => {
     const { piece: queenSideRook } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 0),
+      new MoveModel(kingRow, 0),
     );
     const { piece: queenSideKnight } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 1),
+      new MoveModel(kingRow, 1),
     );
     const { piece: queenSideBishop } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 2),
+      new MoveModel(kingRow, 2),
     );
     const { piece: queen } = board.getSquareOnCoordinate(
-      new CoordinateModel(kingRow, 3),
+      new MoveModel(kingRow, 3),
     );
     return (
       !queenSideRook?.hasMoved && !queenSideKnight && !queenSideBishop && !queen

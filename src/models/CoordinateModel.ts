@@ -3,7 +3,7 @@ import { columnNotation } from "../constants/square-info";
 export class CoordinateModel {
   row: number;
   column: number;
-
+  
   constructor(row: number, column: number) {
     this.row = row;
     this.column = column;

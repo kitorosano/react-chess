@@ -1,7 +1,7 @@
 import { PieceType } from "../../constants/piece-info";
 import { getRowAndColumnValidMoves } from "../../services/move-service";
 import BoardModel from "../BoardModel";
-import { CoordinateModel } from "../CoordinateModel";
+import MoveModel from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
 import PieceModel from "./PieceModel";
@@ -13,8 +13,8 @@ export default class RookPieceModel extends PieceModel {
   getValidMoves = (
     board: BoardModel,
     square: SquareModel,
-  ): Array<CoordinateModel | null> => {
-    const validMoves: Array<CoordinateModel> = [
+  ): Array<MoveModel | null> => {
+    const validMoves: Array<MoveModel> = [
       ...getRowAndColumnValidMoves({
         board,
         square,

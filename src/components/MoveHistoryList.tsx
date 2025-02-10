@@ -1,7 +1,7 @@
-import MoveModel from "../models/MoveModel";
+import MoveHistoryModel from "../models/MoveHistoryModel";
 
 interface Props {
-  moveHistory: Array<MoveModel>;
+  moveHistory: Array<MoveHistoryModel>;
 }
 
 function MoveHistoryList({ moveHistory }: Props) {

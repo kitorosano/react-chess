@@ -1,23 +1,23 @@
 import BoardModel from "../models/BoardModel";
-import { CoordinateModel } from "../models/CoordinateModel";
+import MoveModel from "../models/MoveModel";
 import SquareModel from "../models/SquareModel";
 
 interface CheckValidMove {
   board: BoardModel;
   square: SquareModel;
-  targetCoordinate: CoordinateModel;
+  targetMove: MoveModel;
   blockIfOppositeColor?: boolean;
   blockIfEmpty?: boolean;
 }
 interface MoveCheck {
-  move: CoordinateModel | null;
+  move: MoveModel | null;
   shouldBreak: boolean;
 }
 
 export const checkValidMove = ({
   board,
   square,
-  targetCoordinate,
+  targetMove,
   blockIfOppositeColor = false,
   blockIfEmpty = false,
 }: CheckValidMove): MoveCheck => {
@@ -26,14 +26,14 @@ export const checkValidMove = ({
     shouldBreak: false,
   };
 
-  const targetSquare = board.getSquareOnCoordinate(targetCoordinate);
+  const targetSquare = board.getSquareOnCoordinate(targetMove);
 
   if (targetSquare?.piece) {
     if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor)
-      moveCheck.move = targetCoordinate;
+      moveCheck.move = targetMove;
     moveCheck.shouldBreak = true;
   } else if (!blockIfEmpty) {
-    moveCheck.move = targetCoordinate;
+    moveCheck.move = targetMove;
   }
 
   return moveCheck;
@@ -57,8 +57,8 @@ export const getRowAndColumnValidMoves = ({
   increment,
   rowIncrement,
   columnIncrement,
-}: GetRowColumnValidMovesProps): Array<CoordinateModel> => {
-  const validMoves: Array<CoordinateModel> = [];
+}: GetRowColumnValidMovesProps): Array<MoveModel> => {
+  const validMoves: Array<MoveModel> = [];
 
   for (
     let i = startPos;
@@ -68,9 +68,13 @@ export const getRowAndColumnValidMoves = ({
     const count = Math.abs(i - startPos) + 1;
     const targetRow = square.row + count * rowIncrement;
     const targetColumn = square.column + count * columnIncrement;
-    const targetCoordinate = new CoordinateModel(targetRow, targetColumn);
+    const targetMove = new MoveModel(targetRow, targetColumn);
 
-    const possibleMove = checkValidMove({ board, square, targetCoordinate });
+    const possibleMove = checkValidMove({
+      board,
+      square,
+      targetMove: targetMove,
+    });
     if (possibleMove.move) validMoves.push(possibleMove.move);
     if (possibleMove.shouldBreak) break;
   }
@@ -81,7 +85,7 @@ export const getRowAndColumnValidMoves = ({
 export const getValidMoves = (
   board: BoardModel,
   square: SquareModel | null,
-): Array<CoordinateModel> => {
+): Array<MoveModel> => {
   if (!square || !square.piece) return [];
 
   const validMoves = square.piece.getValidMoves(board, square);
@@ -89,7 +93,7 @@ export const getValidMoves = (
   return validMoves.filter(doesMoveExists).filter(isMoveOutOfBounds);
 };
 
-const doesMoveExists = (move: CoordinateModel | null) => !!move;
-const isMoveOutOfBounds = (move: CoordinateModel): boolean => {
+const doesMoveExists = (move: MoveModel | null) => !!move;
+const isMoveOutOfBounds = (move: MoveModel): boolean => {
   return move.row >= 0 && move.row < 8 && move.column >= 0 && move.column < 8;
 };

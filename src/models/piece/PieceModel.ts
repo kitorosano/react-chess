@@ -5,7 +5,7 @@ import {
   PieceType,
 } from "../../constants/piece-info";
 import BoardModel from "../BoardModel";
-import { CoordinateModel } from "../CoordinateModel";
+import MoveModel from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
 
@@ -26,7 +26,7 @@ export default abstract class PieceModel {
   abstract getValidMoves(
     board: BoardModel,
     square: SquareModel,
-  ): Array<CoordinateModel | null>;
+  ): Array<MoveModel | null>;
 
   getIcon(): string {
     return pieceIcons[this.type];

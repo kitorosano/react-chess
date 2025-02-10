@@ -1,7 +1,7 @@
 import { PieceType } from "../../constants/piece-info";
 import { checkValidMove } from "../../services/move-service";
 import BoardModel from "../BoardModel";
-import { CoordinateModel } from "../CoordinateModel";
+import MoveModel from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";
 import SquareModel from "../SquareModel";
 import PieceModel from "./PieceModel";
@@ -14,20 +14,20 @@ export default class PawnPieceModel extends PieceModel {
   getValidMoves = (
     board: BoardModel,
     square: SquareModel,
-  ): Array<CoordinateModel | null> => {
-    const validMoves: Array<CoordinateModel | null> = [];
+  ): Array<MoveModel | null> => {
+    const validMoves: Array<MoveModel | null> = [];
     const { row, column } = square;
     const isWhite = square.piece!.isWhite();
 
     if (isWhite) {
       for (let i = -1; i <= 2; i++) {
         const isDiagonal = i !== 0;
-        const targetCoordinate = new CoordinateModel(row + 1, column + i);
+        const targetMove = new MoveModel(row + 1, column + i);
         validMoves.push(
           checkValidMove({
             board,
             square,
-            targetCoordinate,
+            targetMove,
             blockIfOppositeColor: !isDiagonal,
             blockIfEmpty: isDiagonal,
           }).move,
@@ -36,12 +36,12 @@ export default class PawnPieceModel extends PieceModel {
 
       const isFirstMove = row === 1;
       if (isFirstMove) {
-        const targetCoordinate = new CoordinateModel(row + 2, column);
+        const targetMove = new MoveModel(row + 2, column);
         validMoves.push(
           checkValidMove({
             board,
             square,
-            targetCoordinate,
+            targetMove,
             blockIfOppositeColor: true,
           }).move,
         );
@@ -49,12 +49,12 @@ export default class PawnPieceModel extends PieceModel {
     } else {
       for (let i = -1; i <= 2; i++) {
         const isDiagonal = i !== 0;
-        const targetCoordinate = new CoordinateModel(row - 1, column + i);
+        const targetMove = new MoveModel(row - 1, column + i);
         validMoves.push(
           checkValidMove({
             board,
             square,
-            targetCoordinate,
+            targetMove,
             blockIfOppositeColor: !isDiagonal,
             blockIfEmpty: isDiagonal,
           }).move,
@@ -63,12 +63,12 @@ export default class PawnPieceModel extends PieceModel {
 
       const isFirstMove = row === 6;
       if (isFirstMove) {
-        const targetCoordinate = new CoordinateModel(row - 2, column);
+        const targetMove = new MoveModel(row - 2, column);
         validMoves.push(
           checkValidMove({
             board,
             square,
-            targetCoordinate,
+            targetMove,
             blockIfOppositeColor: true,
           }).move,
         );

@@ -3,13 +3,13 @@ import "./App.css";
 import Board from "./components/board/Board";
 import MoveHistoryList from "./components/MoveHistoryList";
 import BoardModel from "./models/BoardModel";
-import MoveModel from "./models/MoveModel";
+import MoveHistoryModel from "./models/MoveHistoryModel";
 import { PlayerColor } from "./models/PlayerModel";
 import SquareModel from "./models/SquareModel";
 
 function App() {
   const [board] = useState(new BoardModel());
-  const [moveHistory, setMoveHistory] = useState<Array<MoveModel>>([]);
+  const [moveHistory, setMoveHistory] = useState<Array<MoveHistoryModel>>([]);
   const [playerTurn, setPlayerTurn] = useState(PlayerColor.WHITE);
 
   const handleMovePiece = (
@@ -29,7 +29,7 @@ function App() {
       hasCaptured = !!targetSquare.piece?.type;
     setMoveHistory((currentHistory) => [
       ...currentHistory,
-      new MoveModel(from, to, piece, color, hasCaptured),
+      new MoveHistoryModel(from, to, piece, color, hasCaptured),
     ]);
     setPlayerTurn((currentTurn) =>
       currentTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,

@@ -1,4 +1,4 @@
-import { PieceType } from "../models/PieceModel";
+import { PieceType } from "../models/piece/PieceModel";
 import { PlayerColor } from "../models/PlayerModel";
 
 interface PiecePosition {
@@ -8,20 +8,80 @@ interface PiecePosition {
   playerColor: PlayerColor;
 }
 
-export const initialPiecePositions:Array<PiecePosition> = [
+export const initialPiecePositions: Array<PiecePosition> = [
   // White pieces
-  {rows: [1], columns: [0, 1, 2, 3, 4, 5, 6, 7], pieceType: PieceType.PAWN, playerColor: PlayerColor.WHITE},
-  {rows: [0], columns: [0, 7], pieceType: PieceType.ROOK, playerColor: PlayerColor.WHITE},
-  {rows: [0], columns: [1, 6], pieceType: PieceType.KNIGHT, playerColor: PlayerColor.WHITE},
-  {rows: [0], columns: [2, 5], pieceType: PieceType.BISHOP, playerColor: PlayerColor.WHITE},
-  {rows: [0], columns: [3], pieceType: PieceType.QUEEN, playerColor: PlayerColor.WHITE},
-  {rows: [0], columns: [4], pieceType: PieceType.KING, playerColor: PlayerColor.WHITE},
+  {
+    rows: [1],
+    columns: [0, 1, 2, 3, 4, 5, 6, 7],
+    pieceType: PieceType.PAWN,
+    playerColor: PlayerColor.WHITE,
+  },
+  {
+    rows: [0],
+    columns: [0, 7],
+    pieceType: PieceType.ROOK,
+    playerColor: PlayerColor.WHITE,
+  },
+  {
+    rows: [0],
+    columns: [1, 6],
+    pieceType: PieceType.KNIGHT,
+    playerColor: PlayerColor.WHITE,
+  },
+  {
+    rows: [0],
+    columns: [2, 5],
+    pieceType: PieceType.BISHOP,
+    playerColor: PlayerColor.WHITE,
+  },
+  {
+    rows: [0],
+    columns: [3],
+    pieceType: PieceType.QUEEN,
+    playerColor: PlayerColor.WHITE,
+  },
+  {
+    rows: [0],
+    columns: [4],
+    pieceType: PieceType.KING,
+    playerColor: PlayerColor.WHITE,
+  },
 
   // Black pieces
-  {rows: [6], columns: [0, 1, 2, 3, 4, 5, 6, 7], pieceType: PieceType.PAWN, playerColor: PlayerColor.BLACK},
-  {rows: [7], columns: [0, 7], pieceType: PieceType.ROOK, playerColor: PlayerColor.BLACK},
-  {rows: [7], columns: [1, 6], pieceType: PieceType.KNIGHT, playerColor: PlayerColor.BLACK},
-  {rows: [7], columns: [2, 5], pieceType: PieceType.BISHOP, playerColor: PlayerColor.BLACK},
-  {rows: [7], columns: [3], pieceType: PieceType.QUEEN, playerColor: PlayerColor.BLACK},
-  {rows: [7], columns: [4], pieceType: PieceType.KING, playerColor: PlayerColor.BLACK},
+  {
+    rows: [6],
+    columns: [0, 1, 2, 3, 4, 5, 6, 7],
+    pieceType: PieceType.PAWN,
+    playerColor: PlayerColor.BLACK,
+  },
+  {
+    rows: [7],
+    columns: [0, 7],
+    pieceType: PieceType.ROOK,
+    playerColor: PlayerColor.BLACK,
+  },
+  {
+    rows: [7],
+    columns: [1, 6],
+    pieceType: PieceType.KNIGHT,
+    playerColor: PlayerColor.BLACK,
+  },
+  {
+    rows: [7],
+    columns: [2, 5],
+    pieceType: PieceType.BISHOP,
+    playerColor: PlayerColor.BLACK,
+  },
+  {
+    rows: [7],
+    columns: [3],
+    pieceType: PieceType.QUEEN,
+    playerColor: PlayerColor.BLACK,
+  },
+  {
+    rows: [7],
+    columns: [4],
+    pieceType: PieceType.KING,
+    playerColor: PlayerColor.BLACK,
+  },
 ];

@@ -1,6 +1,6 @@
 import { initialPiecePositions } from "../constants/initial-piece-positions";
 import { CoordinateModel } from "./CoordinateModel";
-import PieceModel from "./PieceModel";
+import PieceModel from "./piece/PieceModel";
 import SquareModel from "./SquareModel";
 
 export default class BoardModel {

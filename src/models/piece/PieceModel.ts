@@ -1,4 +1,7 @@
-import { PlayerColor } from "./PlayerModel";
+import BoardModel from "../BoardModel";
+import { CoordinateModel } from "../CoordinateModel";
+import { PlayerColor } from "../PlayerModel";
+import SquareModel from "../SquareModel";
 
 export enum PieceType {
   PAWN = "PAWN",
@@ -23,7 +26,7 @@ const pieceColors: Record<string, string> = {
   [PlayerColor.BLACK]: "text-black icon-shadow-black",
 };
 
-export default class PieceModel {
+export default abstract class PieceModel {
   readonly type: PieceType;
   readonly color: PlayerColor;
 
@@ -47,6 +50,11 @@ export default class PieceModel {
   isBlack(): boolean {
     return this.color === PlayerColor.BLACK;
   }
+
+  abstract getValidMoves(
+    board: BoardModel,
+    square: SquareModel,
+  ): Array<CoordinateModel | null>;
 
   isPawn(): boolean {
     return this.type === PieceType.PAWN;

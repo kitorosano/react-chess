@@ -11,6 +11,7 @@ interface Props {
   board: BoardModel;
   playingAsWhite: boolean;
   playerTurn: PlayerColor;
+  blockMoves: boolean;
   moveHistory: Array<MoveHistoryModel>;
   movePiece: (
     currentSquare: SquareModel,
@@ -24,6 +25,7 @@ function Board({
   movePiece,
   playingAsWhite,
   playerTurn,
+  blockMoves,
   moveHistory,
 }: Props) {
   const [selectedSquare, setSelectedSquare] = useState<SquareModel | null>(
@@ -54,6 +56,8 @@ function Board({
   );
 
   const handleSelectSquare = (square: SquareModel) => {
+    if (blockMoves) return;
+
     if (!selectedSquare || !isValidMove(square))
       return setSelectedSquare(square);
 

@@ -2,24 +2,56 @@ import { useState } from "react";
 import "./App.css";
 import Board from "./components/board/Board";
 import MoveHistoryList from "./components/MoveHistoryList";
+import PromotionChoice from "./components/PromotionChoice";
 import {
   KING_SIDE_CASTLED_ROOK_COLUMN,
   KING_SIDE_ROOK_COLUMN,
+  pieceClasses,
+  PieceType,
   QUEEN_SIDE_CASTLED_ROOK_COLUMN,
   QUEEN_SIDE_ROOK_COLUMN,
-} from "./constants/initial-piece-positions";
+} from "./constants/piece-info";
 import BoardModel from "./models/BoardModel";
 import { CoordinateModel } from "./models/CoordinateModel";
 import MoveHistoryModel from "./models/MoveHistoryModel";
-import MoveModel from "./models/MoveModel";
+import MoveModel, { MoveType } from "./models/MoveModel";
 import PieceModel from "./models/piece/PieceModel";
 import { PlayerColor } from "./models/PlayerModel";
 import SquareModel from "./models/SquareModel";
 
 function App() {
   const [board] = useState(new BoardModel());
+  const [promotionSquare, setPromotionSquare] = useState<SquareModel | null>(
+    null,
+  );
   const [moveHistory, setMoveHistory] = useState<Array<MoveHistoryModel>>([]);
   const [playerTurn, setPlayerTurn] = useState(PlayerColor.WHITE);
+
+  const switchPlayerTurn = () => {
+    setPlayerTurn((currentTurn) =>
+      currentTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+    );
+  };
+
+  const handlePromotion = (pieceType: PieceType) => {
+    if (!promotionSquare) return;
+
+    board.updateSquarePiece(
+      promotionSquare,
+      new pieceClasses[pieceType](playerTurn),
+    );
+
+    setMoveHistory((currentHistory) => {
+      const lastMove = currentHistory[currentHistory.length - 1];
+      lastMove.type = MoveType.PROMOTION;
+      lastMove.promotedTo = pieceType;
+
+      return [...currentHistory.slice(0, -1), lastMove];
+    });
+
+    setPromotionSquare(null);
+    switchPlayerTurn();
+  };
 
   const handleRookCastling = (
     row: number,
@@ -55,11 +87,22 @@ function App() {
   ) => {
     const { piece: currentPiece } = currentSquare;
     const { piece: targetPiece } = targetSquare;
-    if (!currentPiece) return;
+    if (!currentPiece || !!promotionSquare) return;
 
     currentPiece.setHasMoved();
     board.updateSquarePiece(targetSquare, currentPiece);
     board.updateSquarePiece(currentSquare, null);
+
+    const from = currentSquare.coordinates,
+      to = targetSquare.coordinates,
+      piece = currentPiece.type,
+      color = currentPiece.color,
+      hasCaptured = !!targetPiece?.type,
+      moveType = move.type;
+    setMoveHistory((currentHistory) => [
+      ...currentHistory,
+      new MoveHistoryModel(from, to, piece, color, hasCaptured, moveType),
+    ]);
 
     if (move.isCastleKingSide()) {
       handleRookCastling(
@@ -78,20 +121,12 @@ function App() {
     if (move.isEnPassant()) {
       handleEnPassant(currentPiece, targetSquare);
     }
+    if (move.isPromotion()) {
+      setPromotionSquare(targetSquare);
+      return;
+    }
 
-    const from = currentSquare.coordinates,
-      to = targetSquare.coordinates,
-      piece = currentPiece.type,
-      color = currentPiece.color,
-      hasCaptured = !!targetPiece?.type,
-      moveType = move.type;
-    setMoveHistory((currentHistory) => [
-      ...currentHistory,
-      new MoveHistoryModel(from, to, piece, color, hasCaptured, moveType),
-    ]);
-    setPlayerTurn((currentTurn) =>
-      currentTurn === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
-    );
+    switchPlayerTurn();
   };
 
   return (
@@ -102,7 +137,14 @@ function App() {
         playerTurn={playerTurn}
         moveHistory={moveHistory}
         movePiece={handleMovePiece}
+        blockMoves={!!promotionSquare}
       />
+      {!!promotionSquare && (
+        <PromotionChoice
+          playerTurn={playerTurn}
+          selectPromotion={handlePromotion}
+        />
+      )}
       <MoveHistoryList moveHistory={moveHistory} />
     </main>
   );

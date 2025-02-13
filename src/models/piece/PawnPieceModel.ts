@@ -1,10 +1,12 @@
 import {
+  BLACK_PAWN_MAY_PROMOTE_ROW,
   BLACK_PAWN_ROW,
   BLACK_ROW_FOR_EN_PASSANT,
+  PieceType,
+  WHITE_PAWN_MAY_PROMOTE_ROW,
   WHITE_PAWN_ROW,
   WHITE_ROW_FOR_EN_PASSANT,
-} from "../../constants/initial-piece-positions";
-import { PieceType } from "../../constants/piece-info";
+} from "../../constants/piece-info";
 import { checkValidMove } from "../../services/move-service";
 import BoardModel from "../BoardModel";
 import MoveHistoryModel from "../MoveHistoryModel";
@@ -28,15 +30,15 @@ export default class PawnPieceModel extends PieceModel {
     const isWhite = square.piece!.isWhite();
     const targetMoveRow = isWhite ? row + 1 : row - 1;
     const targetFirstMoveRow = isWhite ? row + 2 : row - 2;
-    const isFirstMove = isWhite
-      ? row === WHITE_PAWN_ROW
-      : row === BLACK_PAWN_ROW;
-
+    const moveType = this.canPromote(square)
+      ? MoveType.PROMOTION
+      : MoveType.NORMAL;
     let cannotDoubleMoveForward = false;
 
-    for (let i = -1; i <= 2; i++) {
+    // Forward, left or right moves. If can promote, change move type to promotion
+    for (let i = -1; i <= 1; i++) {
       const isForwardMove = i === 0;
-      const targetMove = new MoveModel(targetMoveRow, column + i);
+      const targetMove = new MoveModel(targetMoveRow, column + i, moveType);
       const possibleMove = checkValidMove({
         board,
         square,
@@ -44,12 +46,12 @@ export default class PawnPieceModel extends PieceModel {
         blockIfOppositeColor: isForwardMove,
         blockIfEmpty: !isForwardMove,
       });
-      if (isForwardMove && possibleMove.shouldBreak)
-        cannotDoubleMoveForward = true;
+      if (possibleMove.shouldBreak)
+        cannotDoubleMoveForward = possibleMove.shouldBreak;
       validMoves.push(possibleMove.move);
     }
 
-    if (isFirstMove && !cannotDoubleMoveForward) {
+    if (this.canDoubleMoveForward(square, cannotDoubleMoveForward)) {
       const targetMove = new MoveModel(targetFirstMoveRow, column);
       validMoves.push(
         checkValidMove({
@@ -83,6 +85,14 @@ export default class PawnPieceModel extends PieceModel {
     return validMoves;
   };
 
+  canDoubleMoveForward = (square: SquareModel, cannot: boolean): boolean => {
+    const { row } = square;
+    const isWhite = square.piece!.isWhite();
+    const rowForDoubleMove = isWhite ? WHITE_PAWN_ROW : BLACK_PAWN_ROW;
+
+    return row === rowForDoubleMove && !cannot;
+  };
+
   canEnPassant = (square: SquareModel, lastMove: MoveHistoryModel): boolean => {
     const { row: currentRow, column: currentColumn } = square;
     const { row: targetRow, column: targetColumn } = lastMove.to;
@@ -101,5 +111,15 @@ export default class PawnPieceModel extends PieceModel {
       targetRow === rowForEnPassant &&
       (targetColumn === currentColumn + 1 || targetColumn === currentColumn - 1)
     );
+  };
+
+  canPromote = (square: SquareModel): boolean => {
+    const { row } = square;
+    const isWhite = square.piece!.isWhite();
+    const canPromote = isWhite
+      ? row === WHITE_PAWN_MAY_PROMOTE_ROW
+      : row === BLACK_PAWN_MAY_PROMOTE_ROW;
+
+    return canPromote;
   };
 }

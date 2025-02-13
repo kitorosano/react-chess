@@ -1,8 +1,8 @@
 import {
   KING_SIDE_CASTLED_KING_COLUMN,
+  PieceType,
   QUEEN_SIDE_CASTLED_KING_COLUMN,
-} from "../../constants/initial-piece-positions";
-import { PieceType } from "../../constants/piece-info";
+} from "../../constants/piece-info";
 import { checkValidMove } from "../../services/move-service";
 import BoardModel from "../BoardModel";
 import MoveModel, { MoveType } from "../MoveModel";

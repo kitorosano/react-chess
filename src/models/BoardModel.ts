@@ -32,4 +32,15 @@ export default class BoardModel {
     const squareIndex = this.squares.findIndex((s) => s.isEquals(square));
     this.squares[squareIndex].setPiece(piece);
   }
+
+  movePiece(currentSquare: SquareModel, targetSquare: SquareModel) {
+    this.updateSquarePiece(targetSquare, currentSquare.piece);
+    this.updateSquarePiece(currentSquare, null);
+  }
+
+  clone(): BoardModel {
+    const board = new BoardModel();
+    board.squares = this.squares.map((square) => square.clone());
+    return board;
+  }
 }

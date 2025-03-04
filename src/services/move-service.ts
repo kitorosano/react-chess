@@ -2,7 +2,48 @@ import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import BoardModel from "../models/BoardModel";
 import MoveHistoryModel from "../models/MoveHistoryModel";
 import MoveModel from "../models/MoveModel";
+import { PlayerColor } from "../models/PlayerModel";
 import SquareModel from "../models/SquareModel";
+
+const getAllValidMovesForPlayer = (
+  board: BoardModel,
+  playerColor: PlayerColor,
+): Array<MoveModel> => {
+  const allValidMoves: Array<MoveModel> = [];
+
+  board.squares.forEach((square) => {
+    if (square.piece && square.piece.color === playerColor) {
+      const validMoves = getValidMoves(board, square, null);
+      allValidMoves.push(...validMoves);
+    }
+  });
+
+  return allValidMoves;
+};
+
+const isInCheck = (
+  board: BoardModel,
+  square: SquareModel,
+  move: MoveModel | null,
+): boolean => {
+  if (!move) return false;
+
+  const newBoard = board.clone();
+  const targetSquare = newBoard.getSquareOnCoordinate(move);
+  newBoard.movePiece(square, targetSquare);
+
+  const oponentColor = square.piece?.isWhite()
+    ? PlayerColor.BLACK
+    : PlayerColor.WHITE;
+  const allOponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
+    board,
+    oponentColor,
+  );
+
+  if (allOponentValidMoves.some((move) => move.givesCheck)) return true;
+
+  return false;
+};
 
 interface CheckValidMove {
   board: BoardModel;
@@ -31,11 +72,17 @@ export const checkValidMove = ({
   const targetSquare = board.getSquareOnCoordinate(targetMove);
 
   if (targetSquare?.piece) {
-    if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor)
+    if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor) {
       moveCheck.move = targetMove;
+      moveCheck.move.givesCheck = targetSquare.piece.isKing();
+    }
     moveCheck.shouldBreak = true;
   } else if (!blockIfEmpty) {
     moveCheck.move = targetMove;
+  }
+
+  if (isInCheck(board, square, moveCheck.move)) {
+    moveCheck.move = null;
   }
 
   return moveCheck;

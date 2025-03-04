@@ -77,4 +77,10 @@ export default abstract class PieceModel {
   setHasMoved(): void {
     this.hasMoved = true;
   }
+
+  clone(): PieceModel {
+    const piece = PieceModel.create(this.type, this.color);
+    piece.hasMoved = this.hasMoved;
+    return piece;
+  }
 }

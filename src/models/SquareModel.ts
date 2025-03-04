@@ -65,4 +65,10 @@ export default class SquareModel {
   isPieceSameColor(square: SquareModel): boolean {
     return this.piece?.color === square.piece?.color;
   }
+
+  clone(): SquareModel {
+    const square = new SquareModel(this.row, this.column);
+    if (this.piece) square.piece = this.piece?.clone();
+    return square;
+  }
 }

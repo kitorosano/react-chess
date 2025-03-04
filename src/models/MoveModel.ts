@@ -10,6 +10,7 @@ export enum MoveType {
 
 export default class MoveModel extends CoordinateModel {
   type: MoveType;
+  givesCheck: boolean = false;
 
   constructor(row: number, column: number, type: MoveType = MoveType.NORMAL) {
     super(row, column);

@@ -1,6 +1,6 @@
 import { BOARD_COLUMNS, BOARD_ROWS } from "../../constants/board-info";
 import { PieceType } from "../../constants/piece-info";
-import { getRowAndColumnValidMoves } from "../../services/move-service";
+import { getRowAndColumnValidMoves } from "../../services/move-validation-service";
 import BoardModel from "../BoardModel";
 import MoveModel from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";

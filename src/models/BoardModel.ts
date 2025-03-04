@@ -34,6 +34,7 @@ export default class BoardModel {
   }
 
   movePiece(currentSquare: SquareModel, targetSquare: SquareModel) {
+    console.log({ currentSquare, targetSquare });
     this.updateSquarePiece(targetSquare, currentSquare.piece);
     this.updateSquarePiece(currentSquare, null);
   }

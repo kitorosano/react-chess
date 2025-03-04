@@ -7,7 +7,7 @@ import {
   WHITE_PAWN_ROW,
   WHITE_ROW_FOR_EN_PASSANT,
 } from "../../constants/piece-info";
-import { checkValidMove } from "../../services/move-service";
+import { checkValidMove } from "../../services/move-validation-service";
 import BoardModel from "../BoardModel";
 import MoveHistoryModel from "../MoveHistoryModel";
 import MoveModel, { MoveType } from "../MoveModel";

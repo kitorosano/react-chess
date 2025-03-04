@@ -3,7 +3,7 @@ import {
   PieceType,
   QUEEN_SIDE_CASTLED_KING_COLUMN,
 } from "../../constants/piece-info";
-import { checkValidMove } from "../../services/move-service";
+import { checkValidMove } from "../../services/move-validation-service";
 import BoardModel from "../BoardModel";
 import MoveModel, { MoveType } from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";

@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import SquareModel from "../../models/SquareModel";
-import "./square.css";
 
 interface Props {
   square: SquareModel;

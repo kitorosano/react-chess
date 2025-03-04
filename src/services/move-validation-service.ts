@@ -13,8 +13,7 @@ const getAllValidMovesForPlayer = (
 
   board.squares.forEach((square) => {
     if (square.piece && square.piece.color === playerColor) {
-      const validMoves = getValidMoves(board, square, null);
-      allValidMoves.push(...validMoves);
+      // allValidMoves.push(...getValidMoves(board, square, null));
     }
   });
 

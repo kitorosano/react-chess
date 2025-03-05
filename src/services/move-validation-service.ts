@@ -53,14 +53,14 @@ const getAllValidMovesForPlayer = (
 
   board.squares.forEach((square) => {
     if (square.piece && square.piece.color === playerColor) {
-      // allValidMoves.push(...getValidMoves(board, square, null));
+      allValidMoves.push(...getValidMoves(board, square, null, true));
     }
   });
 
   return allValidMoves;
 };
 
-const isInCheck = (
+const wouldBeInCheck = (
   board: BoardModel,
   square: SquareModel,
   move: MoveModel | null,
@@ -78,7 +78,7 @@ const isInCheck = (
     ? PlayerColor.BLACK
     : PlayerColor.WHITE;
   const allOponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
-    board,
+    newBoard,
     oponentColor,
   );
 
@@ -120,7 +120,7 @@ export const checkValidMove = ({
     moveCheck.move = targetMove;
   }
 
-  if (!blockVerifyCheck && isInCheck(board, square, moveCheck.move)) {
+  if (!blockVerifyCheck && wouldBeInCheck(board, square, moveCheck.move)) {
     moveCheck.move = null;
   }
 
@@ -134,10 +134,11 @@ export const getRowAndColumnValidMoves = ({
 }: GetRowColumnValidMovesProps): Array<MoveModel> => {
   const validMoves: Array<MoveModel> = [];
 
-  if (!possibleMove.rowColumnConfig) return validMoves;
+  const { blockVerifyCheck, rowColumnConfig } = possibleMove;
+  if (!rowColumnConfig) return validMoves;
 
   const { startPos, endPos, increment, rowIncrement, columnIncrement } =
-    possibleMove.rowColumnConfig;
+    rowColumnConfig;
 
   for (
     let i = startPos;
@@ -150,7 +151,7 @@ export const getRowAndColumnValidMoves = ({
     const possibleColumn = square.column + count * columnIncrement;
 
     const newPossibleMove = {
-      blockVerifyCheck: true,
+      blockVerifyCheck,
       singleConfig: {
         targetCoordinates: new CoordinateModel(possibleRow, possibleColumn),
         moveType: MoveType.NORMAL,
@@ -173,6 +174,7 @@ export const getValidMoves = (
   board: BoardModel,
   square: SquareModel | null,
   lastMove: MoveHistoryModel | null,
+  blockVerifyCheck = false,
 ): Array<MoveModel> => {
   if (!square || !square.piece) return [];
 
@@ -183,6 +185,7 @@ export const getValidMoves = (
 
   const validMoves: Array<MoveModel | null> = [];
   possibleMoves.forEach((possibleMove) => {
+    possibleMove.blockVerifyCheck = blockVerifyCheck;
     if (possibleMove.singleConfig) {
       validMoves.push(checkValidMove({ board, square, possibleMove }).move);
     }

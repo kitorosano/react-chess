@@ -68,7 +68,9 @@ export default class PawnPieceModel extends PieceModel {
         singleConfig: {
           targetCoordinates: new CoordinateModel(targetFirstMoveRow, column),
           blockIfOppositeColor: true,
-          mustBeEmptyCoordinates: [new CoordinateModel(targetMoveRow, column)],
+          blockIfCoordinatesAreOccupied: [
+            new CoordinateModel(targetMoveRow, column),
+          ],
         },
       });
 

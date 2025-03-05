@@ -37,10 +37,15 @@ export default class KingPieceModel extends PieceModel {
       KING_SIDE_CASTLED_KING_COLUMN,
     );
     possibleMoves.push({
+      mustNotBeInCheck: true,
       singleConfig: {
         targetCoordinates: possibleKingSideCastling,
-        mustBeNotMovedRook: new CoordinateModel(kingRow, 7),
-        mustBeEmptyCoordinates: [
+        blockIfPiecesOnCoordinatesHasMoved: [new CoordinateModel(kingRow, 7)],
+        blockIfCoordinatesAreOccupied: [
+          new CoordinateModel(kingRow, 5),
+          new CoordinateModel(kingRow, 6),
+        ],
+        blockIfCoordinatesPutsInCheck: [
           new CoordinateModel(kingRow, 5),
           new CoordinateModel(kingRow, 6),
         ],
@@ -54,11 +59,16 @@ export default class KingPieceModel extends PieceModel {
       QUEEN_SIDE_CASTLED_KING_COLUMN,
     );
     possibleMoves.push({
+      mustNotBeInCheck: true,
       singleConfig: {
         targetCoordinates: possibleQueenSideCastling,
-        mustBeNotMovedRook: new CoordinateModel(kingRow, 0),
-        mustBeEmptyCoordinates: [
+        blockIfPiecesOnCoordinatesHasMoved: [new CoordinateModel(kingRow, 0)],
+        blockIfCoordinatesAreOccupied: [
           new CoordinateModel(kingRow, 1),
+          new CoordinateModel(kingRow, 2),
+          new CoordinateModel(kingRow, 3),
+        ],
+        blockIfCoordinatesPutsInCheck: [
           new CoordinateModel(kingRow, 2),
           new CoordinateModel(kingRow, 3),
         ],

@@ -11,9 +11,9 @@ interface SingleValidMoveCheck {
   blockIfOppositeColor?: boolean;
   blockIfEmpty?: boolean;
   moveType?: MoveType;
-  mustBeEmptyCoordinates?: Array<CoordinateModel>;
-  // For castling
-  mustBeNotMovedRook?: CoordinateModel;
+  blockIfCoordinatesAreOccupied?: Array<CoordinateModel>;
+  blockIfPiecesOnCoordinatesHasMoved?: Array<CoordinateModel>;
+  blockIfCoordinatesPutsInCheck?: Array<CoordinateModel>;
 }
 interface RowColumnValidMoveCheck {
   startPos: number;
@@ -24,7 +24,8 @@ interface RowColumnValidMoveCheck {
 }
 
 export interface PossibleMove {
-  blockVerifyCheck?: boolean;
+  dontVerifyCheck?: boolean;
+  mustNotBeInCheck?: boolean;
   singleConfig?: SingleValidMoveCheck;
   rowColumnConfig?: RowColumnValidMoveCheck;
 }
@@ -60,19 +61,19 @@ const getAllValidMovesForPlayer = (
   return allValidMoves;
 };
 
-const wouldBeInCheck = (
+const wouldMovePutInCheck = (
   board: BoardModel,
   square: SquareModel,
   move: MoveModel | null,
 ): boolean => {
-  if (!move) return false;
-
   const newBoard = board.clone();
-  const targetSquare = newBoard.getSquareOnCoordinate(move);
 
-  if (!targetSquare) return false;
+  if (move) {
+    const targetSquare = newBoard.getSquareOnCoordinate(move);
+    if (!targetSquare) return false;
 
-  newBoard.movePiece(square, targetSquare);
+    newBoard.movePiece(square, targetSquare);
+  }
 
   const oponentColor = square.piece?.isWhite()
     ? PlayerColor.BLACK
@@ -82,12 +83,63 @@ const wouldBeInCheck = (
     oponentColor,
   );
 
-  if (allOponentValidMoves.some((move) => move.givesCheck)) return true;
-
-  return false;
+  return allOponentValidMoves.some((move) => move.givesCheck);
 };
 
-export const checkValidMove = ({
+export const validateSpecialMove = (
+  board: BoardModel,
+  square: SquareModel,
+  possibleMove: PossibleMove,
+  targetMove: MoveModel,
+): boolean => {
+  const { dontVerifyCheck, mustNotBeInCheck, singleConfig } = possibleMove;
+  if (!singleConfig) return true;
+
+  const {
+    blockIfPiecesOnCoordinatesHasMoved,
+    blockIfCoordinatesAreOccupied,
+    blockIfCoordinatesPutsInCheck,
+  } = singleConfig;
+  let isValid = true;
+
+  if (!dontVerifyCheck) {
+    if (wouldMovePutInCheck(board, square, targetMove)) isValid = false;
+
+    if (mustNotBeInCheck && wouldMovePutInCheck(board, square, null))
+      isValid = false;
+
+    if (blockIfCoordinatesPutsInCheck?.length) {
+      const somePutsInCheck = blockIfCoordinatesPutsInCheck.some(
+        ({ row, column }) => {
+          const move = new MoveModel(row, column, MoveType.NORMAL);
+          return wouldMovePutInCheck(board, square, move);
+        },
+      );
+      if (somePutsInCheck) isValid = false;
+    }
+  }
+  if (blockIfCoordinatesAreOccupied?.length) {
+    const someSquareIsOccupied = blockIfCoordinatesAreOccupied.some(
+      (coordinate) => {
+        const square = board.getSquareOnCoordinate(coordinate);
+        return square?.piece;
+      },
+    );
+    if (someSquareIsOccupied) isValid = false;
+  }
+  if (blockIfPiecesOnCoordinatesHasMoved?.length) {
+    const someEmptySquareOrPieceHasMoved =
+      blockIfPiecesOnCoordinatesHasMoved.some((coordinate) => {
+        const square = board.getSquareOnCoordinate(coordinate);
+        return isEmptySquareOrPieceHasMoved(square);
+      });
+    if (someEmptySquareOrPieceHasMoved) isValid = false;
+  }
+
+  return isValid;
+};
+
+export const validateMove = ({
   board,
   square,
   possibleMove,
@@ -97,11 +149,10 @@ export const checkValidMove = ({
     shouldBreak: false,
   };
 
-  const { blockVerifyCheck, singleConfig } = possibleMove;
-  if (!singleConfig) return moveCheck;
+  if (!possibleMove.singleConfig) return moveCheck;
 
   const { blockIfOppositeColor, blockIfEmpty, targetCoordinates, moveType } =
-    singleConfig;
+    possibleMove.singleConfig;
 
   const targetSquare = board.getSquareOnCoordinate(targetCoordinates);
   const targetMove = new MoveModel(
@@ -120,7 +171,7 @@ export const checkValidMove = ({
     moveCheck.move = targetMove;
   }
 
-  if (!blockVerifyCheck && wouldBeInCheck(board, square, moveCheck.move)) {
+  if (!validateSpecialMove(board, square, possibleMove, targetMove)) {
     moveCheck.move = null;
   }
 
@@ -134,7 +185,7 @@ export const getRowAndColumnValidMoves = ({
 }: GetRowColumnValidMovesProps): Array<MoveModel> => {
   const validMoves: Array<MoveModel> = [];
 
-  const { blockVerifyCheck, rowColumnConfig } = possibleMove;
+  const { dontVerifyCheck: dontVerifyCheck, rowColumnConfig } = possibleMove;
   if (!rowColumnConfig) return validMoves;
 
   const { startPos, endPos, increment, rowIncrement, columnIncrement } =
@@ -151,14 +202,14 @@ export const getRowAndColumnValidMoves = ({
     const possibleColumn = square.column + count * columnIncrement;
 
     const newPossibleMove = {
-      blockVerifyCheck,
+      dontVerifyCheck,
       singleConfig: {
         targetCoordinates: new CoordinateModel(possibleRow, possibleColumn),
         moveType: MoveType.NORMAL,
       },
     };
 
-    const validatedMove = checkValidMove({
+    const validatedMove = validateMove({
       board,
       square,
       possibleMove: newPossibleMove,
@@ -174,7 +225,7 @@ export const getValidMoves = (
   board: BoardModel,
   square: SquareModel | null,
   lastMove: MoveHistoryModel | null,
-  blockVerifyCheck = false,
+  dontVerifyCheck = false,
 ): Array<MoveModel> => {
   if (!square || !square.piece) return [];
 
@@ -185,9 +236,9 @@ export const getValidMoves = (
 
   const validMoves: Array<MoveModel | null> = [];
   possibleMoves.forEach((possibleMove) => {
-    possibleMove.blockVerifyCheck = blockVerifyCheck;
+    possibleMove.dontVerifyCheck = dontVerifyCheck;
     if (possibleMove.singleConfig) {
-      validMoves.push(checkValidMove({ board, square, possibleMove }).move);
+      validMoves.push(validateMove({ board, square, possibleMove }).move);
     }
     if (possibleMove.rowColumnConfig) {
       validMoves.push(
@@ -207,4 +258,8 @@ const isMoveOutOfBounds = (move: MoveModel): boolean => {
     move.column >= 0 &&
     move.column < BOARD_COLUMNS
   );
+};
+const isEmptySquareOrPieceHasMoved = (square: SquareModel | null): boolean => {
+  if (!square || !square.piece) return true;
+  return square.piece.hasMoved;
 };

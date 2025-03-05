@@ -1,9 +1,33 @@
 import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import BoardModel from "../models/BoardModel";
+import { CoordinateModel } from "../models/CoordinateModel";
 import MoveHistoryModel from "../models/MoveHistoryModel";
-import MoveModel from "../models/MoveModel";
+import MoveModel, { MoveType } from "../models/MoveModel";
 import { PlayerColor } from "../models/PlayerModel";
 import SquareModel from "../models/SquareModel";
+
+interface SingleValidMoveCheck {
+  targetCoordinates: CoordinateModel;
+  blockIfOppositeColor?: boolean;
+  blockIfEmpty?: boolean;
+  moveType?: MoveType;
+  mustBeEmptyCoordinates?: Array<CoordinateModel>;
+  // For castling
+  mustBeNotMovedRook?: CoordinateModel;
+}
+interface RowColumnValidMoveCheck {
+  startPos: number;
+  endPos: number;
+  increment: number;
+  rowIncrement: number;
+  columnIncrement: number;
+}
+
+export interface PossibleMove {
+  blockVerifyCheck?: boolean;
+  singleConfig?: SingleValidMoveCheck;
+  rowColumnConfig?: RowColumnValidMoveCheck;
+}
 
 const getAllValidMovesForPlayer = (
   board: BoardModel,
@@ -50,6 +74,7 @@ interface CheckValidMove {
   targetMove: MoveModel;
   blockIfOppositeColor?: boolean;
   blockIfEmpty?: boolean;
+  shouldVerifyCheck?: boolean;
 }
 interface MoveCheck {
   move: MoveModel | null;
@@ -62,6 +87,7 @@ export const checkValidMove = ({
   targetMove,
   blockIfOppositeColor = false,
   blockIfEmpty = false,
+  shouldVerifyCheck = true,
 }: CheckValidMove): MoveCheck => {
   const moveCheck: MoveCheck = {
     move: null,
@@ -80,7 +106,7 @@ export const checkValidMove = ({
     moveCheck.move = targetMove;
   }
 
-  if (isInCheck(board, square, moveCheck.move)) {
+  if (shouldVerifyCheck && isInCheck(board, square, moveCheck.move)) {
     moveCheck.move = null;
   }
 
@@ -137,7 +163,13 @@ export const getValidMoves = (
 ): Array<MoveModel> => {
   if (!square || !square.piece) return [];
 
-  const validMoves = square.piece.getValidMoves(board, square, lastMove);
+  const possibleMoves: Array<PossibleMove> = square.piece.getMoves(
+    square.coordinates,
+    lastMove,
+  );
+
+  // TODO: Implement this
+  const validMoves: Array<MoveModel> = [];
 
   return validMoves.filter(doesMoveExists).filter(isMoveOutOfBounds);
 };

@@ -4,11 +4,10 @@ import {
   pieceIcons,
   PieceType,
 } from "../../constants/piece-info";
-import BoardModel from "../BoardModel";
+import { PossibleMove } from "../../services/move-validation-service";
+import { CoordinateModel } from "../CoordinateModel";
 import MoveHistoryModel from "../MoveHistoryModel";
-import MoveModel from "../MoveModel";
 import { PlayerColor } from "../PlayerModel";
-import SquareModel from "../SquareModel";
 
 export default abstract class PieceModel {
   readonly type: PieceType;
@@ -24,11 +23,10 @@ export default abstract class PieceModel {
     return new pieceClasses[type](color);
   }
 
-  abstract getValidMoves(
-    board: BoardModel,
-    square: SquareModel,
+  abstract getMoves(
+    coordinates: CoordinateModel,
     lastMove: MoveHistoryModel | null,
-  ): Array<MoveModel | null>;
+  ): Array<PossibleMove>;
 
   getStylesIcon(): string {
     return pieceIcons[this.type];

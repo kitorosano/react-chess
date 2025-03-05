@@ -128,6 +128,9 @@ export default class GameModel {
     const targetRookSquare = this.board.getSquareOnCoordinate(
       new CoordinateModel(row, targetColumn),
     );
+
+    if (!currentRookSquare || !targetRookSquare) return;
+
     this.board.updateSquarePiece(targetRookSquare, currentRookSquare.piece);
     this.board.updateSquarePiece(currentRookSquare, null);
   }
@@ -138,6 +141,9 @@ export default class GameModel {
     const pawnToRemoveSquare = this.board.getSquareOnCoordinate(
       new CoordinateModel(targetRow, column),
     );
+
+    if (!pawnToRemoveSquare) return;
+
     this.board.updateSquarePiece(pawnToRemoveSquare, null);
   }
 

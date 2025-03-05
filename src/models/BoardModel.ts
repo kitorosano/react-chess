@@ -24,8 +24,12 @@ export default class BoardModel {
     }
   }
 
-  getSquareOnCoordinate(coordinate: CoordinateModel): SquareModel {
-    return this.squares.find((s) => s.coordinates.isEquals(coordinate))!;
+  getSquareOnCoordinate(coordinate: CoordinateModel): SquareModel | null {
+    const foundSquare = this.squares.find((s) =>
+      s.coordinates.isEquals(coordinate),
+    );
+    if (!foundSquare) return null;
+    return foundSquare;
   }
 
   updateSquarePiece(square: SquareModel, piece: PieceModel | null) {

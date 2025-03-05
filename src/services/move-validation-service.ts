@@ -29,6 +29,22 @@ export interface PossibleMove {
   rowColumnConfig?: RowColumnValidMoveCheck;
 }
 
+interface CheckValidMove {
+  board: BoardModel;
+  square: SquareModel;
+  possibleMove: PossibleMove;
+}
+type MoveCheck = {
+  move: MoveModel | null;
+  shouldBreak: boolean;
+};
+
+interface GetRowColumnValidMovesProps {
+  board: BoardModel;
+  square: SquareModel;
+  possibleMove: PossibleMove;
+}
+
 const getAllValidMovesForPlayer = (
   board: BoardModel,
   playerColor: PlayerColor,
@@ -53,6 +69,9 @@ const isInCheck = (
 
   const newBoard = board.clone();
   const targetSquare = newBoard.getSquareOnCoordinate(move);
+
+  if (!targetSquare) return false;
+
   newBoard.movePiece(square, targetSquare);
 
   const oponentColor = square.piece?.isWhite()
@@ -68,33 +87,28 @@ const isInCheck = (
   return false;
 };
 
-interface CheckValidMove {
-  board: BoardModel;
-  square: SquareModel;
-  targetMove: MoveModel;
-  blockIfOppositeColor?: boolean;
-  blockIfEmpty?: boolean;
-  shouldVerifyCheck?: boolean;
-}
-interface MoveCheck {
-  move: MoveModel | null;
-  shouldBreak: boolean;
-}
-
 export const checkValidMove = ({
   board,
   square,
-  targetMove,
-  blockIfOppositeColor = false,
-  blockIfEmpty = false,
-  shouldVerifyCheck = true,
+  possibleMove,
 }: CheckValidMove): MoveCheck => {
   const moveCheck: MoveCheck = {
     move: null,
     shouldBreak: false,
   };
 
-  const targetSquare = board.getSquareOnCoordinate(targetMove);
+  const { blockVerifyCheck, singleConfig } = possibleMove;
+  if (!singleConfig) return moveCheck;
+
+  const { blockIfOppositeColor, blockIfEmpty, targetCoordinates, moveType } =
+    singleConfig;
+
+  const targetSquare = board.getSquareOnCoordinate(targetCoordinates);
+  const targetMove = new MoveModel(
+    targetCoordinates.row,
+    targetCoordinates.column,
+    moveType,
+  );
 
   if (targetSquare?.piece) {
     if (!targetSquare.isPieceSameColor(square) && !blockIfOppositeColor) {
@@ -106,33 +120,24 @@ export const checkValidMove = ({
     moveCheck.move = targetMove;
   }
 
-  if (shouldVerifyCheck && isInCheck(board, square, moveCheck.move)) {
+  if (!blockVerifyCheck && isInCheck(board, square, moveCheck.move)) {
     moveCheck.move = null;
   }
 
   return moveCheck;
 };
 
-interface GetRowColumnValidMovesProps {
-  board: BoardModel;
-  square: SquareModel;
-  startPos: number;
-  endPos: number;
-  increment: number;
-  rowIncrement: number;
-  columnIncrement: number;
-}
-
 export const getRowAndColumnValidMoves = ({
   board,
   square,
-  startPos,
-  endPos,
-  increment,
-  rowIncrement,
-  columnIncrement,
+  possibleMove,
 }: GetRowColumnValidMovesProps): Array<MoveModel> => {
   const validMoves: Array<MoveModel> = [];
+
+  if (!possibleMove.rowColumnConfig) return validMoves;
+
+  const { startPos, endPos, increment, rowIncrement, columnIncrement } =
+    possibleMove.rowColumnConfig;
 
   for (
     let i = startPos;
@@ -140,17 +145,25 @@ export const getRowAndColumnValidMoves = ({
     i += increment
   ) {
     const count = Math.abs(i - startPos) + 1;
-    const targetRow = square.row + count * rowIncrement;
-    const targetColumn = square.column + count * columnIncrement;
-    const targetMove = new MoveModel(targetRow, targetColumn);
 
-    const possibleMove = checkValidMove({
+    const possibleRow = square.row + count * rowIncrement;
+    const possibleColumn = square.column + count * columnIncrement;
+
+    const newPossibleMove = {
+      blockVerifyCheck: true,
+      singleConfig: {
+        targetCoordinates: new CoordinateModel(possibleRow, possibleColumn),
+        moveType: MoveType.NORMAL,
+      },
+    };
+
+    const validatedMove = checkValidMove({
       board,
       square,
-      targetMove: targetMove,
+      possibleMove: newPossibleMove,
     });
-    if (possibleMove.move) validMoves.push(possibleMove.move);
-    if (possibleMove.shouldBreak) break;
+    if (validatedMove.move) validMoves.push(validatedMove.move);
+    if (validatedMove.shouldBreak) break;
   }
 
   return validMoves;
@@ -168,8 +181,17 @@ export const getValidMoves = (
     lastMove,
   );
 
-  // TODO: Implement this
-  const validMoves: Array<MoveModel> = [];
+  const validMoves: Array<MoveModel | null> = [];
+  possibleMoves.forEach((possibleMove) => {
+    if (possibleMove.singleConfig) {
+      validMoves.push(checkValidMove({ board, square, possibleMove }).move);
+    }
+    if (possibleMove.rowColumnConfig) {
+      validMoves.push(
+        ...getRowAndColumnValidMoves({ board, square, possibleMove }),
+      );
+    }
+  });
 
   return validMoves.filter(doesMoveExists).filter(isMoveOutOfBounds);
 };

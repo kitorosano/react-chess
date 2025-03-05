@@ -14,6 +14,7 @@ function App() {
 
   const handlePromotion = (pieceType: PieceType) => {
     game.promotion(pieceType);
+    setKey(key + 1);
   };
 
   const handleMovePiece = (

@@ -18,7 +18,11 @@ function PromotionChoice({ playerTurn, selectPromotion }: Props) {
     <section className="py-2 flex justify-center items-center gap-3 border shadow">
       <p className="">Choose a piece to promote to:</p>
       {possiblePieceTypes.map((pieceType) => (
-        <span key={pieceType} onClick={() => selectPromotion(pieceType)}>
+        <span
+          key={pieceType}
+          className="cursor-pointer"
+          onClick={() => selectPromotion(pieceType)}
+        >
           <i
             className={`fa fa-solid fa-2xl ${pieceIcons[pieceType]} ${pieceColors[playerTurn]}`}
           ></i>

@@ -1,8 +1,10 @@
 import {
   BLACK_PAWN_MAY_PROMOTE_ROW,
+  BLACK_PAWN_ROW,
   BLACK_ROW_FOR_EN_PASSANT,
   PieceType,
   WHITE_PAWN_MAY_PROMOTE_ROW,
+  WHITE_PAWN_ROW,
   WHITE_ROW_FOR_EN_PASSANT,
 } from "../../constants/piece-info";
 import { PossibleMove } from "../../services/move-validation-service";
@@ -25,7 +27,7 @@ export default class PawnPieceModel extends PieceModel {
     const { row, column } = coordinates;
 
     const targetMoveRow = this.isWhite() ? row + 1 : row - 1;
-    const targetFirstMoveRow = this.isWhite() ? row + 1 : row - 1;
+    const targetFirstMoveRow = this.isWhite() ? row + 2 : row - 2;
     const moveType = this.mayPromote(row)
       ? MoveType.PROMOTION
       : MoveType.NORMAL;
@@ -51,7 +53,7 @@ export default class PawnPieceModel extends PieceModel {
         },
         {
           singleConfig: {
-            targetCoordinates: new CoordinateModel(targetMoveRow, column + 2),
+            targetCoordinates: new CoordinateModel(targetMoveRow, column + 1),
             blockIfOppositeColor: false,
             blockIfEmpty: true,
             moveType,
@@ -61,13 +63,14 @@ export default class PawnPieceModel extends PieceModel {
     );
 
     // Double move forward
-    possibleMoves.push({
-      singleConfig: {
-        targetCoordinates: new CoordinateModel(targetFirstMoveRow, column),
-        blockIfOppositeColor: true,
-        mustBeEmptyCoordinates: [new CoordinateModel(targetMoveRow, column)],
-      },
-    });
+    if (this.mayDoubleMove(row))
+      possibleMoves.push({
+        singleConfig: {
+          targetCoordinates: new CoordinateModel(targetFirstMoveRow, column),
+          blockIfOppositeColor: true,
+          mustBeEmptyCoordinates: [new CoordinateModel(targetMoveRow, column)],
+        },
+      });
 
     // En passant
     if (!lastMove) return possibleMoves;
@@ -89,11 +92,20 @@ export default class PawnPieceModel extends PieceModel {
     return possibleMoves;
   }
 
+  mayDoubleMove = (row: number): boolean => {
+    const canDoubleMove = this.isWhite()
+      ? row === WHITE_PAWN_ROW
+      : row === BLACK_PAWN_ROW;
+
+    return canDoubleMove;
+  };
+
   mayEnPassant = (
     coordinates: CoordinateModel,
     lastMove: MoveHistoryModel,
   ): boolean => {
     const { row: currentRow, column: currentColumn } = coordinates;
+    const { row: previousTargetRow } = lastMove.from;
     const { row: targetRow, column: targetColumn } = lastMove.to;
     const rowForEnPassant = this.isWhite()
       ? WHITE_ROW_FOR_EN_PASSANT
@@ -101,12 +113,16 @@ export default class PawnPieceModel extends PieceModel {
     const isRowForEnPassant = currentRow === rowForEnPassant;
     const pieceIsPawn = lastMove.piece === PieceType.PAWN;
     const isOppositeColor = this.color !== lastMove.color;
+    const lastMoveWasDouble = this.isWhite()
+      ? previousTargetRow === BLACK_PAWN_ROW
+      : previousTargetRow === WHITE_PAWN_ROW;
 
     return (
       isRowForEnPassant &&
       pieceIsPawn &&
       isOppositeColor &&
       targetRow === rowForEnPassant &&
+      lastMoveWasDouble &&
       (targetColumn === currentColumn + 1 || targetColumn === currentColumn - 1)
     );
   };

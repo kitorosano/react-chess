@@ -46,15 +46,16 @@ interface GetRowColumnValidMovesProps {
   possibleMove: PossibleMove;
 }
 
-const getAllValidMovesForPlayer = (
+export const getAllValidMovesForPlayer = (
   board: BoardModel,
   playerColor: PlayerColor,
+  dontVerifyCheck = true,
 ): Array<MoveModel> => {
   const allValidMoves: Array<MoveModel> = [];
 
   board.squares.forEach((square) => {
     if (square.piece && square.piece.color === playerColor) {
-      allValidMoves.push(...getValidMoves(board, square, null, true));
+      allValidMoves.push(...getValidMoves(board, square, null, dontVerifyCheck));
     }
   });
 
@@ -81,6 +82,7 @@ const wouldMovePutInCheck = (
   const allOponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
     newBoard,
     oponentColor,
+    true,
   );
 
   return allOponentValidMoves.some((move) => move.givesCheck);

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import "./App.css";
 import Board from "./components/board/Board";
 import MoveHistoryList from "./components/MoveHistoryList";
 import PromotionChoice from "./components/PromotionChoice";
+import WinnerBanner from "./components/WinnerBanner";
 import { PieceType } from "./constants/piece-info";
 import GameModel from "./models/GameModel";
 import MoveModel from "./models/MoveModel";
@@ -12,9 +12,11 @@ function App() {
   const [key, setKey] = useState(0);
   const [game] = useState(new GameModel());
 
+  const rerender = () => setKey(key + 1);
+
   const handlePromotion = (pieceType: PieceType) => {
     game.promotion(pieceType);
-    setKey(key + 1);
+    rerender();
   };
 
   const handleMovePiece = (
@@ -23,7 +25,7 @@ function App() {
     move: MoveModel,
   ) => {
     game.movePiece(currentSquare, targetSquare, move);
-    setKey(key + 1);
+    rerender();
   };
 
   const handleGetValidMoves = (square: SquareModel | null) => {
@@ -32,11 +34,12 @@ function App() {
 
   return (
     <main key={key} className="max-w-xl w-3/4 mx-auto my-4">
+      {game.getWinner() && <WinnerBanner color={game.getWinner()} />}
       <Board
         board={game.getBoard()}
         playingAsWhite={true}
         playerTurn={game.getPlayerTurn()}
-        blockMoves={!!game.getPromotionSquare()}
+        blockMoves={!!game.getPromotionSquare() || !!game.getWinner()}
         movePiece={handleMovePiece}
         getValidMoves={handleGetValidMoves}
       />

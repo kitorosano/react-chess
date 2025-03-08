@@ -6,7 +6,10 @@ import {
   QUEEN_SIDE_CASTLED_ROOK_COLUMN,
   QUEEN_SIDE_ROOK_COLUMN,
 } from "../constants/piece-info";
-import { getValidMoves } from "../services/move-validation-service";
+import {
+  getAllValidMovesForPlayer,
+  getValidMoves,
+} from "../services/move-validation-service";
 import BoardModel from "./BoardModel";
 import { CoordinateModel } from "./CoordinateModel";
 import MoveHistoryModel from "./MoveHistoryModel";
@@ -20,6 +23,7 @@ export default class GameModel {
   private moveHistory: Array<MoveHistoryModel> = [];
   private playerTurn: PlayerColor = PlayerColor.WHITE;
   private promotionSquare: SquareModel | null = null;
+  private winner: PlayerColor | null = null;
 
   constructor() {
     this.board = new BoardModel();
@@ -50,10 +54,16 @@ export default class GameModel {
       this.playerTurn === PlayerColor.WHITE
         ? PlayerColor.BLACK
         : PlayerColor.WHITE;
+
+    this.checkForWinner();
   }
 
   getPromotionSquare(): SquareModel | null {
     return this.promotionSquare;
+  }
+
+  getWinner(): PlayerColor | null {
+    return this.winner;
   }
 
   movePiece(
@@ -149,5 +159,19 @@ export default class GameModel {
 
   getValidMoves(square: SquareModel | null): Array<MoveModel> {
     return getValidMoves(this.board, square, this.getLastMove());
+  }
+
+  checkForWinner() {
+    const playerValidMoves = getAllValidMovesForPlayer(
+      this.board,
+      this.playerTurn,
+      false,
+    );
+    if (!playerValidMoves.length) {
+      this.winner =
+        this.playerTurn === PlayerColor.WHITE
+          ? PlayerColor.BLACK
+          : PlayerColor.WHITE;
+    }
   }
 }

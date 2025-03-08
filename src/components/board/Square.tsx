@@ -7,8 +7,9 @@ interface Props {
   showCoordinatesRow?: boolean;
   isSelected?: boolean;
   canSelect?: boolean;
-  select: (square: SquareModel) => void;
   showAsValidMove?: boolean;
+  isInCheck?: boolean;
+  select: (square: SquareModel) => void;
 }
 
 function Square({
@@ -17,17 +18,20 @@ function Square({
   showCoordinatesRow,
   isSelected,
   canSelect,
-  select,
   showAsValidMove,
+  isInCheck,
+  select,
 }: Props) {
   const backgroundColor = useMemo(
     () =>
-      isSelected
+      isInCheck
+        ? "bg-red-500"
+        : isSelected
         ? "bg-gray-400"
         : square.isLightSquare()
         ? "bg-slate-100"
         : "bg-orange-900",
-    [isSelected, square],
+    [isSelected, square, isInCheck],
   );
 
   const handleClick = () => {

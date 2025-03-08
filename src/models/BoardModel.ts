@@ -1,7 +1,9 @@
 import { BOARD_COLUMNS, BOARD_ROWS } from "../constants/board-info";
 import { initialPiecePositions } from "../constants/initial-piece-positions";
+import { PieceType } from "../constants/piece-info";
 import { CoordinateModel } from "./CoordinateModel";
 import PieceModel from "./piece/PieceModel";
+import { PlayerColor } from "./PlayerModel";
 import SquareModel from "./SquareModel";
 
 export default class BoardModel {
@@ -46,5 +48,15 @@ export default class BoardModel {
     const board = new BoardModel();
     board.squares = this.squares.map((square) => square.clone());
     return board;
+  }
+
+  getKingSquare(playerColor: PlayerColor): SquareModel | null {
+    const kingSquare = this.squares.find(
+      (square) =>
+        square.piece?.type === PieceType.KING &&
+        square.piece?.color === playerColor,
+    );
+    if (!kingSquare) return null;
+    return kingSquare;
   }
 }

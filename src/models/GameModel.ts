@@ -174,4 +174,18 @@ export default class GameModel {
           : PlayerColor.WHITE;
     }
   }
+
+  playerInCheck(): boolean {
+    const playerColor = this.playerTurn;
+    const oponentColor =
+      playerColor === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+
+    const allOponentValidMoves: Array<MoveModel> = getAllValidMovesForPlayer(
+      this.board,
+      oponentColor,
+      true,
+    );
+
+    return allOponentValidMoves.some((move) => move.givesCheck);
+  }
 }

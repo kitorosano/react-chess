@@ -10,6 +10,7 @@ interface Props {
   playingAsWhite: boolean;
   playerTurn: PlayerColor;
   blockMoves: boolean;
+  playerInCheck: boolean;
   movePiece: (
     currentSquare: SquareModel,
     targetSquare: SquareModel,
@@ -23,6 +24,7 @@ function Board({
   playingAsWhite,
   playerTurn,
   blockMoves,
+  playerInCheck,
   movePiece,
   getValidMoves,
 }: Props) {
@@ -75,6 +77,11 @@ function Board({
         const canSelectSquare =
           square?.piece?.color === playerTurn || isValidMove(square);
 
+        let isInCheck = false;
+        const kingSquare = board.getKingSquare(playerTurn);
+        if (playerInCheck && kingSquare) {
+          isInCheck = playerInCheck && square.isEquals(kingSquare);
+        }
         return (
           <div
             key={`square_${square.row}_${square.column}`}
@@ -88,6 +95,7 @@ function Board({
               isSelected={isSquareSelected}
               canSelect={canSelectSquare}
               select={handleSelectSquare}
+              isInCheck={isInCheck}
             />
           </div>
         );

@@ -42,6 +42,7 @@ function App() {
         blockMoves={!!game.getPromotionSquare() || !!game.getWinner()}
         movePiece={handleMovePiece}
         getValidMoves={handleGetValidMoves}
+        playerInCheck={game.playerInCheck()}
       />
       {!!game.getPromotionSquare() && (
         <PromotionChoice
